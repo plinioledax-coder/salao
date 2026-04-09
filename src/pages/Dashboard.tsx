@@ -45,27 +45,10 @@ type DrawerType =
 
 type DateFilter = "today" | "week" | "month" | "custom";
 
-interface StockAlert {
-  id: string;
-  product: string;
-  current: number;
-  minimum: number;
-  unit: string;
-}
-
 interface DateRange {
   from: Date;
   to: Date;
 }
-
-// ---------------------------------------------------------------------------
-// Mock extra data (substitua por chamadas reais ao Supabase)
-// ---------------------------------------------------------------------------
-const MOCK_STOCK_ALERTS: StockAlert[] = [
-  { id: "1", product: "Tintura Louro 9.0", current: 2, minimum: 10, unit: "un" },
-  { id: "2", product: "Shampoo Profissional 1L", current: 1, minimum: 5, unit: "un" },
-  { id: "3", product: "Água Oxigenada 30vol", current: 3, minimum: 12, unit: "un" },
-];
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -87,7 +70,7 @@ function getDateRange(filter: DateFilter): DateRange {
 function filterLabel(filter: DateFilter): string {
   return (
     { today: "Hoje", week: "Esta semana", month: "Este mês", custom: "Personalizado" }[
-      filter
+    filter
     ] ?? "Hoje"
   );
 }
@@ -106,7 +89,6 @@ function Drawer({
   title: string;
   children: React.ReactNode;
 }) {
-  // Close on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -119,7 +101,6 @@ function Drawer({
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop */}
           <motion.div
             key="backdrop"
             initial={{ opacity: 0 }}
@@ -128,7 +109,6 @@ function Drawer({
             className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
             onClick={onClose}
           />
-          {/* Panel */}
           <motion.div
             key="drawer"
             initial={{ x: "100%" }}
@@ -137,7 +117,6 @@ function Drawer({
             transition={{ type: "spring", damping: 28, stiffness: 260 }}
             className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col"
           >
-            {/* Header */}
             <div className="flex items-center justify-between px-6 py-5 border-b border-aura-charcoal/5">
               <h2 className="font-serif text-xl">{title}</h2>
               <button
@@ -147,7 +126,6 @@ function Drawer({
                 <X className="w-4 h-4" />
               </button>
             </div>
-            {/* Content */}
             <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
               {children}
             </div>
@@ -228,56 +206,40 @@ function DateFilterButton({
 // ---------------------------------------------------------------------------
 export function Dashboard() {
   const [loading, setLoading] = useState(true);
+
+  // States para os dados da API
   const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([]);
   const [birthdays, setBirthdays] = useState<Customer[]>([]);
   const [newCustomers, setNewCustomers] = useState<Customer[]>([]);
-
-  const [drawerType, setDrawerType] = useState<DrawerType>(null);
-  const [selectedBirthday, setSelectedBirthday] = useState<Customer | null>(null);
-  const [dateFilter, setDateFilter] = useState<DateFilter>("today");
-
-  // Stats (ainda mockados — substituir por agregações reais)
-  const [stats] = useState({
-    revenue: 12450,
-    appointments: 42,
-    newCustomers: 12,
-    stockAlerts: MOCK_STOCK_ALERTS.length,
+  const [criticalStock, setCriticalStock] = useState<any[]>([]);
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [topProfessional, setTopProfessional] = useState<any>({
+    name: "Aguardando dados...", role: "-", rating: 5.0, appointments: 0, revenue: 0
+  });
+  const [stats, setStats] = useState({
+    revenue: 0, appointments: 0, newCustomers: 0, stockAlerts: 0
   });
 
-  const topProfessional = {
-    name: "Ana Silva",
-    role: "Cabelereira",
-    rating: 4.9,
-    appointments: 28,
-    revenue: 6800,
-    // Critério: maior faturamento gerado no período
-  };
-
-  const chartData = [
-    { name: "Seg", value: 400 },
-    { name: "Ter", value: 300 },
-    { name: "Qua", value: 600 },
-    { name: "Qui", value: 800 },
-    { name: "Sex", value: 500 },
-    { name: "Sáb", value: 900 },
-    { name: "Dom", value: 200 },
-  ];
+  // UI States
+  const [drawerType, setDrawerType] = useState<DrawerType>(null);
+  const [selectedBirthday, setSelectedBirthday] = useState<Customer | null>(null);
+  const [dateFilter, setDateFilter] = useState<DateFilter>("week");
 
   const cards = [
     {
-      label: "Receita Mensal",
-      value: `R$ ${stats.revenue.toLocaleString("pt-BR")}`,
+      label: "Receita",
+      value: `R$ ${stats.revenue.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`,
       icon: TrendingUp,
-      trend: "+12%",
+      trend: "Faturamento",
       color: "text-aura-sage",
-      drawer: null as DrawerType, // Receita pode ter próprio drawer futuramente
+      drawer: null as DrawerType,
       description: "Total faturado no período selecionado",
     },
     {
       label: "Agendamentos",
       value: stats.appointments,
       icon: CalendarIcon,
-      trend: "+5%",
+      trend: "Pendentes",
       color: "text-aura-gold",
       drawer: "appointments" as DrawerType,
       description: "Agendamentos pendentes (não concluídos)",
@@ -286,7 +248,7 @@ export function Dashboard() {
       label: "Novos Clientes",
       value: stats.newCustomers,
       icon: Users,
-      trend: "+18%",
+      trend: "Novos",
       color: "text-aura-clay",
       drawer: "newCustomers" as DrawerType,
       description: "Cadastrados nos últimos 30 dias",
@@ -306,10 +268,21 @@ export function Dashboard() {
     const fetchDashboard = async () => {
       try {
         setLoading(true);
-        const data = await getDashboardData();
+
+        let daysRange = 0;
+        if (dateFilter === "week") daysRange = 7;
+        if (dateFilter === "month") daysRange = 30;
+
+        const data = await getDashboardData(daysRange);
+
         setUpcomingAppointments(data.todayAppointments);
         setBirthdays(data.birthdays);
-        // setNewCustomers(data.newCustomers); // quando disponível na API
+        setNewCustomers(data.newCustomers);
+        setStats(data.stats);
+        setCriticalStock(data.inventory);
+        setChartData(data.chartData);
+        if (data.topProfessional) setTopProfessional(data.topProfessional);
+
       } catch (error) {
         console.error("Erro ao carregar dashboard:", error);
       } finally {
@@ -336,9 +309,6 @@ export function Dashboard() {
     return `https://wa.me/55${phone.replace(/\D/g, "")}?text=${msg}`;
   };
 
-  // ---------------------------------------------------------------------------
-  // Drawer content renderers
-  // ---------------------------------------------------------------------------
   const renderDrawerContent = () => {
     switch (drawerType) {
       // ---- Agendamentos ----
@@ -355,7 +325,7 @@ export function Dashboard() {
               </div>
             ) : (
               upcomingAppointments
-                .filter((a) => a.status !== "concluido")
+                .filter((a) => a.status !== "completed" && a.status !== "cancelled")
                 .map((appt, i) => (
                   <motion.div
                     key={i}
@@ -369,11 +339,11 @@ export function Dashboard() {
                       <span
                         className={cn(
                           "text-[10px] px-2 py-0.5 rounded-full font-bold uppercase",
-                          appt.status === "confirmado"
+                          appt.status === "confirmed"
                             ? "bg-green-100 text-green-700"
-                            : appt.status === "pendente"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-aura-soft-gray text-aura-charcoal/50"
+                            : appt.status === "scheduled"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-aura-soft-gray text-aura-charcoal/50"
                         )}
                       >
                         {appt.status}
@@ -400,34 +370,17 @@ export function Dashboard() {
                 <strong className="text-aura-charcoal">O que é um novo cliente?</strong>
                 <br />
                 Clientes cujo cadastro foi criado nos{" "}
-                <strong>últimos 30 dias</strong>. Independente de já terem
-                agendado ou não.
+                <strong>últimos 30 dias</strong>. Independente de já terem agendado ou não.
               </p>
             </div>
             <p className="text-xs text-aura-charcoal/40 uppercase tracking-widest font-semibold">
               {stats.newCustomers} novos clientes · últimos 30 dias
             </p>
-            {/* Quando a API retornar newCustomers, mapear aqui */}
+
             {newCustomers.length === 0 ? (
-              <div className="space-y-3 mt-4">
-                {/* Placeholder visual enquanto API não retorna */}
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="p-4 rounded-2xl border border-aura-charcoal/5 flex items-center gap-4"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-aura-soft-gray flex items-center justify-center text-aura-charcoal/20">
-                      <Users className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="h-3 bg-aura-soft-gray rounded-full w-32 mb-2" />
-                      <div className="h-2 bg-aura-soft-gray rounded-full w-20" />
-                    </div>
-                  </div>
-                ))}
-                <p className="text-center text-xs text-aura-charcoal/30 pt-2">
-                  Conecte a query de novos clientes na API para ver os dados reais
-                </p>
+              <div className="text-center py-10 text-aura-charcoal/40">
+                <Users className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                <p className="text-sm">Nenhum cliente novo neste período.</p>
               </div>
             ) : (
               newCustomers.map((c, i) => (
@@ -444,7 +397,7 @@ export function Dashboard() {
                   <div>
                     <p className="font-medium text-sm">{c.name}</p>
                     <p className="text-xs text-aura-charcoal/40">
-                      {/* c.created_at ? format(new Date(c.created_at), "dd 'de' MMMM", { locale: ptBR }) : "" */}
+                      {c.phone || "Sem telefone"}
                     </p>
                   </div>
                 </motion.div>
@@ -458,53 +411,54 @@ export function Dashboard() {
         return (
           <div className="space-y-3">
             <p className="text-xs text-aura-charcoal/40 uppercase tracking-widest font-semibold mb-4">
-              {MOCK_STOCK_ALERTS.length} produtos em estado crítico
+              {criticalStock.length} produtos em estado crítico
             </p>
-            {MOCK_STOCK_ALERTS.map((item, i) => {
-              const pct = Math.round((item.current / item.minimum) * 100);
-              return (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, x: 10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.08 }}
-                  className="p-4 rounded-2xl border border-red-100 bg-red-50/50"
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-xl bg-red-100 text-red-500">
-                        <Package className="w-4 h-4" />
+            {criticalStock.length === 0 ? (
+              <p className="text-center text-sm text-aura-charcoal/40 py-10">Estoque regularizado.</p>
+            ) : (
+              criticalStock.map((item, i) => {
+                const min = item.min_quantity || 1;
+                const pct = Math.round((item.quantity / min) * 100);
+
+                return (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, x: 10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.08 }}
+                    className="p-4 rounded-2xl border border-red-100 bg-red-50/50"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-xl bg-red-100 text-red-500">
+                          <Package className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">{item.name}</p>
+                          <p className="text-xs text-aura-charcoal/40">
+                            Mínimo exigido: {item.min_quantity}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-medium text-sm">{item.product}</p>
-                        <p className="text-xs text-aura-charcoal/40">
-                          Mínimo: {item.minimum} {item.unit}
-                        </p>
-                      </div>
-                    </div>
-                    <span className="text-lg font-serif text-red-500 font-bold">
-                      {item.current}
-                      <span className="text-xs font-sans text-red-400 ml-1">
-                        {item.unit}
+                      <span className="text-lg font-serif text-red-500 font-bold">
+                        {item.quantity}
+                        <span className="text-xs font-sans text-red-400 ml-1">un</span>
                       </span>
-                    </span>
-                  </div>
-                  {/* Progress bar */}
-                  <div className="h-1.5 bg-red-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-red-400 rounded-full"
-                      style={{ width: `${Math.min(pct, 100)}%` }}
-                    />
-                  </div>
-                  <p className="text-[10px] text-red-400 mt-1 text-right">
-                    {pct}% do mínimo
-                  </p>
-                </motion.div>
-              );
-            })}
-            <button className="w-full mt-4 py-3 rounded-2xl border-2 border-dashed border-aura-charcoal/10 text-xs text-aura-charcoal/40 hover:border-aura-gold/30 hover:text-aura-gold transition-all font-semibold uppercase tracking-widest">
-              Ir para Estoque Completo
-            </button>
+                    </div>
+                    {/* Progress bar */}
+                    <div className="h-1.5 bg-red-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-red-400 rounded-full"
+                        style={{ width: `${Math.min(pct, 100)}%` }}
+                      />
+                    </div>
+                    <p className="text-[10px] text-red-400 mt-1 text-right">
+                      {pct}% do mínimo
+                    </p>
+                  </motion.div>
+                );
+              })
+            )}
           </div>
         );
 
@@ -512,7 +466,7 @@ export function Dashboard() {
       case "professional":
         return (
           <div className="space-y-6">
-            <div className="flex items-center gap-4 p-6 rounded-2xl bg-aura-charcoal text-white">
+            <div className="flex items-center gap-4 p-6 rounded-2xl bg-gray-900 text-white">
               <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center text-aura-gold">
                 <Users className="w-8 h-8" />
               </div>
@@ -564,7 +518,7 @@ export function Dashboard() {
               </div>
               <div>
                 <p className="font-serif text-lg">{selectedBirthday.name}</p>
-                <p className="text-xs text-aura-charcoal/40">Aniversariante</p>
+                <p className="text-xs text-aura-charcoal/40">Aniversariante do Mês</p>
               </div>
             </div>
 
@@ -573,7 +527,6 @@ export function Dashboard() {
               vai abrir o WhatsApp com a mensagem pronta — é só enviar!
             </p>
 
-            {/* Cupom preview */}
             <div className="p-4 rounded-2xl bg-gradient-to-br from-aura-gold/10 to-aura-clay/10 border border-aura-gold/20">
               <div className="flex items-center gap-2 mb-2">
                 <Gift className="w-4 h-4 text-aura-gold" />
@@ -609,7 +562,7 @@ export function Dashboard() {
     appointments: "Agendamentos Pendentes",
     newCustomers: "Novos Clientes",
     stockAlerts: "Alertas de Estoque",
-    professional: "Profissional da Semana",
+    professional: "Profissional em Destaque",
     birthday: `Parabéns, ${selectedBirthday?.name?.split(" ")[0] ?? ""}! 🎂`,
   };
 
@@ -626,7 +579,6 @@ export function Dashboard() {
 
   return (
     <>
-      {/* ---- Drawer ---- */}
       <Drawer
         open={!!drawerType}
         onClose={() => {
@@ -639,7 +591,6 @@ export function Dashboard() {
       </Drawer>
 
       <div className="space-y-10">
-        {/* ---- Header com filtro de data ---- */}
         <div className="flex items-center justify-between">
           <div>
             <h2 className="font-serif text-2xl">Dashboard</h2>
@@ -653,7 +604,6 @@ export function Dashboard() {
           <DateFilterButton value={dateFilter} onChange={setDateFilter} />
         </div>
 
-        {/* ---- Stats Grid ---- */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {cards.map((card, i) => (
             <motion.div
@@ -671,18 +621,17 @@ export function Dashboard() {
             >
               <div className="flex items-start justify-between">
                 <div
-                  className={`p-3 rounded-2xl bg-aura-soft-gray ${card.color} ${
-                    card.drawer ? "group-hover:scale-110 transition-transform" : ""
-                  }`}
+                  className={`p-3 rounded-2xl bg-aura-soft-gray ${card.color} ${card.drawer ? "group-hover:scale-110 transition-transform" : ""
+                    }`}
                 >
                   <card.icon className="w-6 h-6" />
                 </div>
                 <span
                   className={cn(
                     "text-[10px] font-bold px-2 py-1 rounded-full",
-                    card.trend.startsWith("+")
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-red-700"
+                    card.trend === "Crítico"
+                      ? "bg-red-100 text-red-700"
+                      : "bg-green-100 text-green-700"
                   )}
                 >
                   {card.trend}
@@ -704,14 +653,12 @@ export function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* ---- Chart ---- */}
           <div className="lg:col-span-2 glass-card p-8">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-lg font-serif">Fluxo de Receita</h3>
-              <select className="bg-aura-soft-gray border-none rounded-lg text-xs px-3 py-1 outline-none">
-                <option>Últimos 7 dias</option>
-                <option>Último mês</option>
-              </select>
+              <p className="text-xs uppercase tracking-widest text-aura-charcoal/40 font-bold">
+                {filterLabel(dateFilter)}
+              </p>
             </div>
             <div className="h-[300px] w-full">
               <div style={{ width: "100%", height: "100%" }}>
@@ -756,46 +703,49 @@ export function Dashboard() {
             </div>
           </div>
 
-          {/* ---- Side Panels ---- */}
           <div className="space-y-8">
-            {/* Top Professional — CLICÁVEL, cor corrigida */}
+            {/* Top Professional — CLICÁVEL, HARMONIZADO COM O TEMA CLARO */}
             <motion.div
               whileHover={{ scale: 1.01 }}
               onClick={() => openDrawer("professional")}
-              className="glass-card p-6 bg-aura-charcoal cursor-pointer hover:ring-2 hover:ring-aura-gold/30 transition-all group"
+              className="glass-card p-6 cursor-pointer hover:ring-2 hover:ring-aura-gold/30 transition-all group"
             >
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="text-sm font-serif italic text-aura-gold">
+              <div className="flex items-center justify-between mb-5 border-b border-aura-charcoal/5 pb-4">
+                <h4 className="text-sm font-serif italic text-aura-gold font-bold">
                   Profissional da Semana
                 </h4>
-                <Star className="w-4 h-4 text-aura-gold fill-aura-gold" />
+                <Star className="w-5 h-5 text-aura-gold fill-aura-gold" />
               </div>
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-aura-gold">
-                  <Users className="w-6 h-6" />
+                <div className="w-14 h-14 rounded-full bg-aura-soft-gray flex items-center justify-center text-aura-gold">
+                  <Users className="w-7 h-7" />
                 </div>
-                <div>
-                  {/* ✅ Cor corrigida: era branco em branco */}
-                  <p className="font-medium text-white">{topProfessional.name}</p>
-                  <p className="text-[10px] uppercase tracking-widest text-white/50">
+                <div className="flex-1">
+                  {/* Nome em cor escura padrão */}
+                  <p className="font-serif text-xl text-aura-charcoal font-bold leading-tight">
+                    {topProfessional.name}
+                  </p>
+                  {/* Cargo em cor escura com opacidade para hierarquia */}
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-aura-charcoal/60 font-bold mt-1">
                     {topProfessional.role}
                   </p>
                 </div>
-                <div className="ml-auto text-right">
-                  <p className="text-lg font-serif text-aura-gold">
+                <div className="text-right">
+                  <p className="text-2xl font-serif text-aura-gold leading-none">
                     {topProfessional.rating}
+                    <span className="text-sm font-sans text-aura-gold/60 ml-1">★</span>
                   </p>
-                  <p className="text-[10px] text-white/50">
-                    {topProfessional.appointments} atend.
+                  <p className="text-[10px] text-aura-charcoal/40 uppercase tracking-widest mt-1">
+                    {topProfessional.appointments} atendimentos
                   </p>
                 </div>
               </div>
-              <p className="text-[10px] text-aura-gold/60 mt-4 text-right flex items-center justify-end gap-1 group-hover:text-aura-gold transition-colors">
-                Ver detalhes <ChevronRight className="w-3 h-3" />
+
+              <p className="text-[10px] font-bold uppercase tracking-widest text-aura-gold/80 mt-6 text-right flex items-center justify-end gap-1.5 group-hover:text-aura-gold transition-colors border-t border-aura-charcoal/5 pt-4">
+                Ver desempenho completo <ChevronRight className="w-3.5 h-3.5" />
               </p>
             </motion.div>
 
-            {/* Birthdays — CLICÁVEL por item */}
             <div className="glass-card p-6">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="text-sm font-serif italic">Aniversariantes</h4>
@@ -817,14 +767,20 @@ export function Dashboard() {
                           {b.name}
                         </p>
                       </div>
-                      <button className="p-1.5 rounded-full bg-aura-soft-gray text-aura-charcoal/40 hover:bg-[#25D366]/10 hover:text-[#25D366] transition-all flex items-center gap-1">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // Impede de abrir o Drawer e já manda pro Zap direto
+                          window.open(whatsappLink((b as any).phone ?? "00000000000", b.name), '_blank');
+                        }}
+                        className="p-1.5 rounded-full bg-aura-soft-gray text-aura-charcoal/40 hover:bg-[#25D366]/10 hover:text-[#25D366] transition-all flex items-center gap-1"
+                      >
                         <MessageCircle className="w-3 h-3" />
                       </button>
                     </div>
                   ))
                 ) : (
                   <p className="text-xs text-aura-charcoal/40 text-center py-2">
-                    Nenhum aniversariante hoje.
+                    Nenhum aniversariante neste mês.
                   </p>
                 )}
               </div>
@@ -832,7 +788,6 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* ---- Upcoming Appointments ---- */}
         <div className="glass-card p-8">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-lg font-serif">Próximos Agendamentos de Hoje</h3>
@@ -857,13 +812,16 @@ export function Dashboard() {
                         {format(new Date(appt.start_time), "HH:mm")}
                       </span>
                     </div>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-aura-soft-gray text-aura-charcoal/60 uppercase font-bold">
+                    <span className={cn(
+                      "text-[10px] px-2 py-0.5 rounded-full uppercase font-bold",
+                      appt.status === "confirmed" ? "bg-green-100 text-green-700" : "bg-aura-soft-gray text-aura-charcoal/60"
+                    )}>
                       {appt.status}
                     </span>
                   </div>
                   <p className="font-serif text-lg mb-1">{appt.customer_name}</p>
                   <div className="flex items-center justify-between">
-                    <p className="text-xs text-aura-charcoal/40">Serviço Agendado</p>
+                    <p className="text-xs text-aura-charcoal/40">{appt.service_name || 'Serviço Agendado'}</p>
                     <div className="w-6 h-6 rounded-full bg-aura-soft-gray flex items-center justify-center text-aura-charcoal/20">
                       <Users className="w-3 h-3" />
                     </div>
@@ -872,7 +830,7 @@ export function Dashboard() {
               ))
             ) : (
               <div className="col-span-full py-10 text-center text-aura-charcoal/30">
-                Nenhum agendamento para hoje. Aproveite para organizar o salão! ✨
+                Nenhum agendamento pendente para hoje. Aproveite para organizar o salão! ✨
               </div>
             )}
           </div>

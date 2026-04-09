@@ -55,11 +55,7 @@ export function BookingFlow({ isOpen, onClose }: BookingFlowProps) {
     startOfDay(addDays(new Date(), 1)),
   );
   const [selectedTime, setSelectedTime] = useState("");
-  const [customerInfo, setCustomerInfo] = useState({
-    name: "",
-    phone: "",
-    email: "",
-  });
+  const [customerInfo, setCustomerInfo] = useState({ name: '', phone: '', email: '', birthday: '' });
 
   // Carrega os dados quando o modal abre
   useEffect(() => {
@@ -113,7 +109,9 @@ export function BookingFlow({ isOpen, onClose }: BookingFlowProps) {
 
       await createAppointment({
         customer_name: customerInfo.name,
-        // customer_id: null (como é público, não associamos a um utilizador registado ainda)
+        customer_phone: customerInfo.phone,       // NOVO
+        customer_email: customerInfo.email,       // NOVO
+        customer_birthday: customerInfo.birthday, // NOVO
         professional_id: selectedProf.id,
         service_id: selectedService.id,
         service_name: selectedService.name,
@@ -483,6 +481,15 @@ export function BookingFlow({ isOpen, onClose }: BookingFlowProps) {
                               email: e.target.value,
                             })
                           }
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] uppercase tracking-widest text-aura-charcoal/40">Data de Aniversário</label>
+                        <input 
+                          placeholder="DD/MM/AAAA"
+                          className="w-full bg-white border border-aura-charcoal/5 rounded-xl px-4 py-3 outline-none focus:border-aura-gold/50 transition-colors"
+                          value={customerInfo.birthday}
+                          onChange={e => setCustomerInfo({...customerInfo, birthday: e.target.value})}
                         />
                       </div>
                     </div>
