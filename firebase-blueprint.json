@@ -1,0 +1,106 @@
+{
+  "entities": {
+    "Professional": {
+      "title": "Professional",
+      "description": "A staff member at the beauty salon.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "photoUrl": { "type": "string" },
+        "active": { "type": "boolean" },
+        "commissionRate": { "type": "number", "description": "Percentage of service value." },
+        "workingHours": { "type": "object" },
+        "goals": { "type": "object" }
+      },
+      "required": ["name", "role", "active"]
+    },
+    "Appointment": {
+      "title": "Appointment",
+      "description": "A scheduled service for a customer.",
+      "type": "object",
+      "properties": {
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "professionalId": { "type": "string" },
+        "service": { "type": "string" },
+        "startTime": { "type": "string", "format": "date-time" },
+        "endTime": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["scheduled", "confirmed", "waiting", "in_service", "completed", "cancelled", "no_show"] },
+        "price": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "notes": { "type": "string" },
+        "isBlocked": { "type": "boolean", "description": "If true, this is a time block, not a service." }
+      },
+      "required": ["customerName", "professionalId", "service", "startTime", "endTime", "status"]
+    },
+    "InventoryItem": {
+      "title": "Inventory Item",
+      "description": "A product or supply in stock.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "quantity": { "type": "number" },
+        "minQuantity": { "type": "number" },
+        "unitPrice": { "type": "number" },
+        "supplier": { "type": "string" },
+        "costPrice": { "type": "number" }
+      },
+      "required": ["name", "quantity", "minQuantity"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "A financial record (income or expense).",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["income", "expense"] },
+        "amount": { "type": "number" },
+        "category": { "type": "string" },
+        "description": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "appointmentId": { "type": "string" },
+        "paymentMethod": { "type": "string" }
+      },
+      "required": ["type", "amount", "date"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "A salon client.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "birthday": { "type": "string" },
+        "lastVisit": { "type": "string", "format": "date-time" },
+        "totalSpent": { "type": "number" },
+        "loyaltyPoints": { "type": "number" },
+        "isVip": { "type": "boolean", "description": "Whether the customer is a VIP member." },
+        "technicalFile": { "type": "object", "description": "Color formulas, allergies, etc." },
+        "notes": { "type": "string" },
+        "internalNotes": { "type": "string" },
+        "photoUrl": { "type": "string" }
+      },
+      "required": ["name", "phone"]
+    },
+    "LoyaltyRule": {
+      "title": "Loyalty Rule",
+      "type": "object",
+      "properties": {
+        "pointsPerReal": { "type": "number" },
+        "rewardThreshold": { "type": "number" },
+        "rewardDescription": { "type": "string" }
+      }
+    }
+  },
+  "firestore": {
+    "/professionals": { "schema": "Professional", "description": "List of salon professionals." },
+    "/appointments": { "schema": "Appointment", "description": "Salon appointment bookings." },
+    "/inventory": { "schema": "InventoryItem", "description": "Product stock levels." },
+    "/transactions": { "schema": "Transaction", "description": "Financial ledger." },
+    "/customers": { "schema": "Customer", "description": "Client database." },
+    "/settings": { "schema": "object", "description": "App settings like loyalty rules." }
+  }
+}

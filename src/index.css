@@ -1,0 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", serif;
+  
+  --color-aura-cream: #FDFBF7;
+  --color-aura-sage: #8A9A5B;
+  --color-aura-gold: #D4AF37;
+  --color-aura-charcoal: #36454F;
+  --color-aura-clay: #B87333;
+  --color-aura-soft-gray: #F2F2F2;
+}
+
+@layer base {
+  body {
+    @apply bg-aura-cream text-aura-charcoal font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+.glass-card {
+  @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-sm rounded-2xl;
+}
+
+.aura-button {
+  @apply px-6 py-2 rounded-full transition-all duration-300 font-medium;
+}
+
+.aura-button-primary {
+  @apply bg-aura-charcoal text-white hover:bg-aura-charcoal/90 shadow-lg hover:shadow-xl;
+}
+
+.aura-button-secondary {
+  @apply bg-white text-aura-charcoal border border-aura-charcoal/10 hover:bg-aura-soft-gray;
+}
+
