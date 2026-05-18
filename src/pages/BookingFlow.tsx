@@ -155,7 +155,7 @@ export function BookingFlow({ isOpen, onClose }: BookingFlowProps) {
             {step > 1 && step < 5 && (
               <button
                 onClick={() => setStep(step - 1)}
-                className="p-2 -ml-2 rounded-full hover:bg-aura-soft-gray text-aura-charcoal/40 hover:text-aura-charcoal transition-colors"
+                className="p-2 -ml-2 rounded-full hover:bg-aura-charcoal/5 text-aura-charcoal/40 hover:text-aura-charcoal transition-colors"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
@@ -166,7 +166,7 @@ export function BookingFlow({ isOpen, onClose }: BookingFlowProps) {
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-aura-soft-gray text-aura-charcoal/40 hover:text-aura-charcoal transition-colors"
+            className="p-2 rounded-full hover:bg-aura-charcoal/5 text-aura-charcoal/40 hover:text-aura-charcoal transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -215,7 +215,7 @@ export function BookingFlow({ isOpen, onClose }: BookingFlowProps) {
                             "p-3 rounded-xl transition-colors",
                             selectedService?.id === service.id
                               ? "bg-aura-gold/10 text-aura-gold"
-                              : "bg-aura-soft-gray text-aura-charcoal/40 group-hover:text-aura-gold",
+                              : "bg-aura-charcoal/5 text-aura-charcoal/40 group-hover:text-aura-gold",
                           )}
                         >
                           <Scissors className="w-6 h-6" />
@@ -263,7 +263,7 @@ export function BookingFlow({ isOpen, onClose }: BookingFlowProps) {
                       }}
                       className="flex items-center gap-4 p-6 rounded-2xl border bg-white/50 border-aura-charcoal/5 hover:border-aura-gold/30 hover:bg-white transition-all text-left group"
                     >
-                      <div className="w-12 h-12 rounded-full bg-aura-soft-gray flex items-center justify-center text-aura-charcoal/20 group-hover:text-aura-gold transition-colors">
+                      <div className="w-12 h-12 rounded-full bg-aura-charcoal/5 flex items-center justify-center text-aura-charcoal/20 group-hover:text-aura-gold transition-colors">
                         <Sparkles className="w-6 h-6" />
                       </div>
                       <div>
@@ -295,7 +295,7 @@ export function BookingFlow({ isOpen, onClose }: BookingFlowProps) {
                             "w-12 h-12 rounded-full flex items-center justify-center transition-colors",
                             selectedProf?.id === prof.id
                               ? "bg-aura-gold/10 text-aura-gold"
-                              : "bg-aura-soft-gray text-aura-charcoal/20 group-hover:text-aura-gold",
+                              : "bg-aura-charcoal/5 text-aura-charcoal/20 group-hover:text-aura-gold",
                           )}
                         >
                           <User className="w-6 h-6" />
@@ -421,7 +421,7 @@ export function BookingFlow({ isOpen, onClose }: BookingFlowProps) {
                         {format(selectedDate, "d 'de' MMMM", { locale: ptBR })}{" "}
                         às {selectedTime}
                       </p>
-                      <p className="text-aura-sage font-bold mt-1">
+                      <p className="text-aura-gold font-bold mt-1">
                         R$ {Number(selectedService?.price).toFixed(2)}
                       </p>
                     </div>
@@ -523,7 +523,7 @@ export function BookingFlow({ isOpen, onClose }: BookingFlowProps) {
                   animate={{ opacity: 1, scale: 1 }}
                   className="text-center space-y-8 py-12"
                 >
-                  <div className="w-24 h-24 bg-aura-sage/10 rounded-full flex items-center justify-center mx-auto text-aura-sage">
+                  <div className="w-24 h-24 bg-aura-gold/10 rounded-full flex items-center justify-center mx-auto text-aura-gold">
                     <CheckCircle2 className="w-12 h-12" />
                   </div>
                   <div className="space-y-2">

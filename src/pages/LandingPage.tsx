@@ -6,76 +6,15 @@ import {
   MapPin,
   Phone,
   Clock,
-  ChevronRight,
-  Sparkles,
-  Scissors,
-  Heart,
-  Star,
   ArrowUpRight,
-  Play,
+  Menu,
+  X,
+  Heart,
 } from 'lucide-react';
 import { BookingFlow } from './BookingFlow';
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   ANIMATED MESH GRADIENT BACKGROUND
-───────────────────────────────────────────────────────────────────────────── */
-function MeshBackground() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden>
-      <svg
-        className="absolute inset-0 w-full h-full"
-        xmlns="http://www.w3.org/2000/svg"
-        style={{ filter: 'blur(60px)', opacity: 0.55 }}
-      >
-        <defs>
-          <radialGradient id="g1" cx="20%" cy="20%" r="50%">
-            <stop offset="0%" stopColor="#C9A96E" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#C9A96E" stopOpacity="0" />
-          </radialGradient>
-          <radialGradient id="g2" cx="80%" cy="60%" r="50%">
-            <stop offset="0%" stopColor="#8FAF8E" stopOpacity="0.6" />
-            <stop offset="100%" stopColor="#8FAF8E" stopOpacity="0" />
-          </radialGradient>
-          <radialGradient id="g3" cx="50%" cy="90%" r="50%">
-            <stop offset="0%" stopColor="#E8D5C0" stopOpacity="0.7" />
-            <stop offset="100%" stopColor="#E8D5C0" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        <motion.ellipse
-          cx="20%" cy="20%" rx="40%" ry="40%"
-          fill="url(#g1)"
-          animate={{ cx: ['20%', '25%', '18%', '20%'], cy: ['20%', '28%', '15%', '20%'] }}
-          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.ellipse
-          cx="80%" cy="60%" rx="45%" ry="45%"
-          fill="url(#g2)"
-          animate={{ cx: ['80%', '72%', '85%', '80%'], cy: ['60%', '68%', '55%', '60%'] }}
-          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-        />
-        <motion.ellipse
-          cx="50%" cy="90%" rx="40%" ry="35%"
-          fill="url(#g3)"
-          animate={{ cx: ['50%', '58%', '44%', '50%'], cy: ['90%', '85%', '92%', '90%'] }}
-          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 4 }}
-        />
-      </svg>
-
-      {/* Grain texture overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-          backgroundRepeat: 'repeat',
-          backgroundSize: '128px',
-        }}
-      />
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   MAGNETIC BUTTON
+   MAGNETIC BUTTON (Keep for premium interaction but on sharp elements)
 ───────────────────────────────────────────────────────────────────────────── */
 function MagneticButton({
   children,
@@ -113,179 +52,22 @@ function MagneticButton({
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   FLOATING STATS CARD
-───────────────────────────────────────────────────────────────────────────── */
-function StatsCard() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 40, y: 20 }}
-      whileInView={{ opacity: 1, x: 0, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: 0.6, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute -top-8 -right-8 z-10 hidden lg:block"
-    >
-      <div
-        className="rounded-3xl p-6 shadow-2xl"
-        style={{
-          background: 'rgba(255,255,255,0.65)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(201,169,110,0.25)',
-          minWidth: 180,
-        }}
-      >
-        <p className="text-[9px] uppercase tracking-[0.25em] text-aura-charcoal/40 mb-3">Avaliação</p>
-        <div className="flex gap-0.5 mb-2">
-          {[1,2,3,4,5].map(i => (
-            <Star key={i} className="w-3.5 h-3.5 fill-aura-gold text-aura-gold" />
-          ))}
-        </div>
-        <p className="text-3xl font-serif italic text-aura-charcoal">4.9</p>
-        <p className="text-[10px] text-aura-charcoal/40 mt-1">+320 avaliações</p>
-      </div>
-    </motion.div>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   TESTIMONIAL CARD (hero bottom-left)
-───────────────────────────────────────────────────────────────────────────── */
-function TestimonialCard() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: 0.8, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute -bottom-8 -left-8 z-10 hidden md:block max-w-[250px]"
-    >
-      <div
-        className="rounded-3xl p-6 shadow-2xl"
-        style={{
-          background: 'rgba(255,255,255,0.65)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(143,175,142,0.2)',
-        }}
-      >
-        <div className="flex gap-0.5 mb-3">
-          {[1,2,3,4,5].map(i => (
-            <Star key={i} className="w-3 h-3 fill-aura-gold text-aura-gold" />
-          ))}
-        </div>
-        <p className="text-sm font-serif italic text-aura-charcoal leading-snug mb-3">
-          "O melhor atendimento que já tive. Ambiente impecável!"
-        </p>
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-aura-sage/30 flex items-center justify-center text-[9px] font-bold text-aura-sage">
-            M
-          </div>
-          <p className="text-[9px] uppercase tracking-widest text-aura-charcoal/40">Mariana Silva</p>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   SERVICE CARD
-───────────────────────────────────────────────────────────────────────────── */
-function ServiceCard({
-  service,
-  index,
-  onBook,
-}: {
-  service: { title: string; desc: string; icon: React.ElementType; img: string; tag: string };
-  index: number;
-  onBook: () => void;
-}) {
-  const [hovered, setHovered] = React.useState(false);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.12, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onClick={onBook}
-      className="group cursor-pointer relative"
-    >
-      {/* Image container */}
-      <div className="aspect-[3/4] rounded-[32px] overflow-hidden mb-6 relative shadow-xl">
-        <motion.img
-          src={service.img}
-          alt={service.title}
-          className="w-full h-full object-cover"
-          animate={{ scale: hovered ? 1.08 : 1 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          referrerPolicy="no-referrer"
-        />
-
-        {/* Gradient overlay */}
-        <div
-          className="absolute inset-0 transition-opacity duration-500"
-          style={{
-            background: 'linear-gradient(to top, rgba(42,38,33,0.85) 0%, rgba(42,38,33,0.1) 55%, transparent 100%)',
-            opacity: hovered ? 1 : 0.7,
-          }}
-        />
-
-        {/* Tag top-left */}
-        <div className="absolute top-5 left-5">
-          <span
-            className="text-[9px] uppercase tracking-[0.2em] font-bold px-3 py-1.5 rounded-full"
-            style={{
-              background: 'rgba(255,255,255,0.18)',
-              backdropFilter: 'blur(12px)',
-              color: 'rgba(255,255,255,0.9)',
-              border: '1px solid rgba(255,255,255,0.2)',
-            }}
-          >
-            {service.tag}
-          </span>
-        </div>
-
-        {/* Bottom content */}
-        <div className="absolute bottom-0 left-0 right-0 p-7">
-          <service.icon className="w-7 h-7 mb-3 text-aura-gold" />
-          <h4 className="text-2xl font-serif italic text-white mb-2">{service.title}</h4>
-
-          {/* CTA arrow - slides up on hover */}
-          <motion.div
-            className="flex items-center gap-2 text-white/60 text-xs uppercase tracking-widest"
-            animate={{ opacity: hovered ? 1 : 0, y: hovered ? 0 : 8 }}
-            transition={{ duration: 0.3 }}
-          >
-            Agendar agora
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </motion.div>
-        </div>
-      </div>
-
-      <p className="text-aura-charcoal/55 font-light leading-relaxed px-2 text-[15px]">
-        {service.desc}
-      </p>
-    </motion.div>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
    MARQUEE STRIP
 ───────────────────────────────────────────────────────────────────────────── */
 function MarqueeStrip() {
   const items = ['Cabelo', 'Manicure', 'Pedicure', 'Estética Facial', 'Coloração', 'Tratamentos', 'Relaxamento'];
 
   return (
-    <div className="py-5 overflow-hidden border-y border-aura-charcoal/8 bg-aura-gold/5">
+    <div className="py-4 overflow-hidden border-y border-editorial bg-aura-cream">
       <motion.div
         className="flex gap-12 whitespace-nowrap"
         animate={{ x: ['0%', '-50%'] }}
-        transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
+        transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
       >
         {[...items, ...items, ...items, ...items].map((item, i) => (
-          <span key={i} className="inline-flex items-center gap-4 text-[10px] uppercase tracking-[0.25em] text-aura-charcoal/40 font-bold">
+          <span key={i} className="inline-flex items-center gap-12 text-[10px] uppercase tracking-[0.25em] text-aura-charcoal font-medium">
             {item}
-            <span className="w-1 h-1 rounded-full bg-aura-gold inline-block" />
+            <span className="w-1 h-1 bg-aura-charcoal inline-block" />
           </span>
         ))}
       </motion.div>
@@ -294,106 +76,7 @@ function MarqueeStrip() {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   ABOUT / STATS SECTION
-───────────────────────────────────────────────────────────────────────────── */
-function AboutSection() {
-  const stats = [
-    { value: '6+', label: 'Anos de experiência' },
-    { value: '2K+', label: 'Clientes satisfeitas' },
-    { value: '98%', label: 'Índice de retorno' },
-    { value: '12', label: 'Profissionais especializadas' },
-  ];
-
-  return (
-    <section id="sobre" className="py-32 px-6 relative overflow-hidden">
-      <MeshBackground />
-
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center mb-24">
-          {/* Left: text */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="space-y-8"
-          >
-            <p className="text-[10px] uppercase tracking-[0.3em] text-aura-gold font-bold">Nossa História</p>
-            <h3 className="text-5xl md:text-6xl font-serif italic text-aura-charcoal leading-[1.05]">
-              Beleza que <br />
-              <span className="text-aura-sage">transforma</span>.
-            </h3>
-            <p className="text-base text-aura-charcoal/55 font-light leading-relaxed max-w-md">
-              Desde 2020 cultivamos um espaço onde técnica e acolhimento se encontram. Cada visita é uma experiência sensorial cuidadosamente desenhada para você sair transformada — por dentro e por fora.
-            </p>
-            <p className="text-base text-aura-charcoal/55 font-light leading-relaxed max-w-md">
-              Utilizamos produtos premium, técnicas atualizadas e, acima de tudo, escuta ativa para entregar resultados que superam expectativas.
-            </p>
-          </motion.div>
-
-          {/* Right: image mosaic */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
-            className="grid grid-cols-2 gap-4"
-          >
-            <div className="aspect-[3/4] rounded-[28px] overflow-hidden row-span-2 shadow-xl">
-              <img
-                src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=600"
-                alt="Studio"
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-            <div className="aspect-square rounded-[28px] overflow-hidden shadow-xl">
-              <img
-                src="https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&q=80&w=400"
-                alt="Detail"
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-            <div className="aspect-square rounded-[28px] overflow-hidden shadow-xl">
-              <img
-                src="https://images.unsplash.com/photo-1631730359585-a4a4e1a2ee06?auto=format&fit=crop&q=80&w=400"
-                alt="Treatment"
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Stats grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {stats.map((s, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-[24px] p-8"
-              style={{
-                background: 'rgba(255,255,255,0.55)',
-                backdropFilter: 'blur(16px)',
-                border: '1px solid rgba(201,169,110,0.15)',
-              }}
-            >
-              <p className="text-4xl font-serif italic text-aura-charcoal mb-2">{s.value}</p>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-aura-charcoal/40 font-bold">{s.label}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   MAIN LANDING PAGE
+   MAIN LANDING PAGE (EDITORIAL)
 ───────────────────────────────────────────────────────────────────────────── */
 interface LandingPageProps {
   onEnterPortal: () => void;
@@ -401,425 +84,306 @@ interface LandingPageProps {
 
 export function LandingPage({ onEnterPortal }: LandingPageProps) {
   const [isBookingOpen, setIsBookingOpen] = React.useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const { scrollY } = useScroll();
-  const heroImageY = useTransform(scrollY, [0, 600], [0, 80]);
-  const heroTextY = useTransform(scrollY, [0, 400], [0, -40]);
+  const heroImageY = useTransform(scrollY, [0, 800], [0, 120]);
+
+  const navLinks = ['Início', 'Serviços', 'Sobre', 'Contato'];
 
   return (
-    <div className="min-h-screen bg-aura-cream selection:bg-aura-gold/30">
-
+    <div className="min-h-screen bg-aura-cream text-aura-charcoal font-sans">
+      
       {/* ── NAVBAR ────────────────────────────────────────────────────────── */}
-      <motion.nav
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-0 w-full z-50"
-        style={{
-          background: 'rgba(248,243,236,0.75)',
-          backdropFilter: 'blur(24px)',
-          borderBottom: '1px solid rgba(42,38,33,0.05)',
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <motion.div
-            className="flex items-center gap-2"
-            whileHover={{ scale: 1.02 }}
-            transition={{ type: 'spring', stiffness: 400 }}
-          >
-            <h1 className="text-3xl font-serif italic text-aura-charcoal">Studio Modesto</h1>
-            <motion.span
-              className="w-1.5 h-1.5 rounded-full bg-aura-gold"
-              animate={{ scale: [1, 1.4, 1] }}
-              transition={{ duration: 2.5, repeat: Infinity }}
-            />
-          </motion.div>
+      <nav className="fixed top-0 w-full z-50 bg-aura-cream/90 backdrop-blur-md border-b border-editorial">
+        <div className="max-w-[1600px] mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
+          <div className="text-2xl font-serif tracking-widest uppercase">
+            Studio Modesto
+          </div>
 
-          <div className="hidden md:flex items-center gap-10">
-            {['Início', 'Serviços', 'Sobre', 'Contato'].map((item) => (
+          <div className="hidden md:flex items-center gap-12">
+            {navLinks.map((item) => (
               <a
                 key={item}
                 href={`#${item.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`}
-                className="relative text-[10px] uppercase tracking-widest text-aura-charcoal/50 hover:text-aura-charcoal transition-colors duration-300 group"
+                className="text-[10px] uppercase tracking-[0.2em] hover:text-aura-gold transition-colors duration-300"
               >
                 {item}
-                <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-aura-gold transition-all duration-300 group-hover:w-full" />
               </a>
             ))}
           </div>
 
-          <MagneticButton
-            onClick={onEnterPortal}
-            className="aura-button aura-button-primary text-[10px] uppercase tracking-widest py-3 px-6"
+          <button
+            className="md:hidden p-2 focus:outline-none"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            Portal do Gestor
-          </MagneticButton>
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
         </div>
-      </motion.nav>
+      </nav>
 
-      {/* ── HERO ──────────────────────────────────────────────────────────── */}
-      <section id="inicio" className="relative min-h-screen flex items-center overflow-hidden">
-        {/* Animated mesh background */}
-        <MeshBackground />
-
-        {/* Decorative ring */}
-        <div
-          className="absolute -right-64 -top-64 w-[700px] h-[700px] rounded-full pointer-events-none"
-          style={{
-            border: '1px solid rgba(201,169,110,0.12)',
-            boxShadow: 'inset 0 0 80px rgba(201,169,110,0.05)',
-          }}
-        />
-        <div
-          className="absolute -right-40 -top-40 w-[500px] h-[500px] rounded-full pointer-events-none"
-          style={{ border: '1px solid rgba(201,169,110,0.08)' }}
-        />
-
-        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-20 w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-
-            {/* Left: copy */}
-            <motion.div style={{ y: heroTextY }} className="space-y-8">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[10px] uppercase tracking-[0.2em] font-bold text-aura-gold"
-                style={{
-                  background: 'rgba(201,169,110,0.1)',
-                  border: '1px solid rgba(201,169,110,0.2)',
-                }}
-              >
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
-                >
-                  <Sparkles className="w-3 h-3" />
-                </motion.div>
-                Experiência Única de Beleza
-              </motion.div>
-
-              <motion.h2
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                className="font-serif italic text-aura-charcoal"
-                style={{ fontSize: 'clamp(3.5rem, 7vw, 5.5rem)', lineHeight: 0.92 }}
-              >
-                Realce sua
-                <br />
-                <span className="relative inline-block text-aura-sage">
-                  essência
-                  {/* Underline decoration */}
-                  <motion.svg
-                    className="absolute -bottom-2 left-0 w-full"
-                    viewBox="0 0 200 12" fill="none"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ delay: 1, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    <motion.path
-                      d="M2 8 Q50 2 100 8 Q150 14 198 8"
-                      stroke="#8FAF8E"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      fill="none"
-                      initial={{ pathLength: 0 }}
-                      animate={{ pathLength: 1 }}
-                      transition={{ delay: 1, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                    />
-                  </motion.svg>
-                </span>{' '}
-                natural.
-              </motion.h2>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5, duration: 0.8 }}
-                className="text-lg text-aura-charcoal/55 font-light leading-relaxed max-w-md"
-              >
-                Um refúgio de tranquilidade e sofisticação onde cada detalhe é pensado para o seu bem-estar e autoestima.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.65, duration: 0.8 }}
-                className="flex flex-col sm:flex-row gap-4 pt-4"
-              >
-                <MagneticButton
-                  onClick={() => setIsBookingOpen(true)}
-                  className="aura-button aura-button-primary px-10 py-4 text-[11px] uppercase tracking-widest"
-                >
-                  Agendar Horário
-                </MagneticButton>
-
-                <motion.a
-                  href="#servicos"
-                  className="inline-flex items-center justify-center gap-2 px-10 py-4 text-[11px] uppercase tracking-widest rounded-full text-aura-charcoal/70 hover:text-aura-charcoal transition-colors duration-300"
-                  style={{ border: '1px solid rgba(42,38,33,0.15)' }}
-                  whileHover={{ borderColor: 'rgba(201,169,110,0.5)', scale: 1.02 }}
-                >
-                  <Play className="w-3 h-3 fill-aura-charcoal/60" />
-                  Ver Serviços
-                </motion.a>
-              </motion.div>
-            </motion.div>
-
-            {/* Right: hero image with parallax */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.92 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.4, duration: 1, ease: [0.16, 1, 0.3, 1] }}
-              className="relative"
-            >
-              <StatsCard />
-
-              <motion.div
-                style={{ y: heroImageY }}
-                className="aspect-[4/5] rounded-[40px] overflow-hidden shadow-2xl"
-              >
-                <img
-                  src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=1000"
-                  alt="Salon Interior"
-                  className="w-full h-full object-cover scale-110"
-                  referrerPolicy="no-referrer"
-                />
-                {/* Subtle vignette */}
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background: 'radial-gradient(ellipse at center, transparent 60%, rgba(42,38,33,0.2) 100%)',
-                  }}
-                />
-              </motion.div>
-
-              <TestimonialCard />
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-        >
-          <p className="text-[9px] uppercase tracking-[0.3em] text-aura-charcoal/30">Scroll</p>
+      {/* ── MOBILE MENU ────────────────────────────────────────────────────── */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
           <motion.div
-            className="w-px h-8 bg-gradient-to-b from-aura-charcoal/30 to-transparent"
-            animate={{ scaleY: [1, 1.5, 1], opacity: [0.3, 0.7, 0.3] }}
-            transition={{ duration: 1.8, repeat: Infinity }}
-          />
-        </motion.div>
-      </section>
-
-      {/* ── MARQUEE ───────────────────────────────────────────────────────── */}
-      <MarqueeStrip />
-
-      {/* ── SERVICES ─────────────────────────────────────────────────────── */}
-      <section id="servicos" className="py-32 relative overflow-hidden">
-        {/* Background accent */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(248,243,236,0.3) 100%)' }}
-        />
-
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7 }}
-            className="flex items-end justify-between mb-20"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-40 bg-aura-cream pt-24 px-6 md:hidden border-b border-editorial"
           >
-            <div className="space-y-4">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-aura-gold font-bold">Nossas Especialidades</p>
-              <h3 className="text-5xl md:text-6xl font-serif italic text-aura-charcoal leading-[1.05]">
-                Cuidado em cada <br />detalhe.
-              </h3>
-            </div>
-            <motion.button
-              onClick={() => setIsBookingOpen(true)}
-              className="hidden md:flex items-center gap-2 text-[11px] uppercase tracking-widest text-aura-charcoal/50 hover:text-aura-charcoal transition-colors duration-300 group"
-              whileHover={{ x: 4 }}
-            >
-              Ver todos
-              <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </motion.button>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                title: 'Cabelo',
-                desc: 'Cortes, coloração e tratamentos personalizados para fios saudáveis e cheios de vida.',
-                icon: Scissors,
-                img: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&q=80&w=600',
-                tag: 'Mais popular',
-              },
-              {
-                title: 'Manicure & Pedicure',
-                desc: 'Esmaltação impecável e cuidados relaxantes para mãos e pés com produtos premium.',
-                icon: Heart,
-                img: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&q=80&w=600',
-                tag: 'Exclusivo',
-              },
-              {
-                title: 'Estética Facial',
-                desc: 'Limpeza de pele e procedimentos avançados para uma pele radiante e jovem.',
-                icon: Sparkles,
-                img: 'https://images.unsplash.com/photo-1570172619245-711f8ad1507f?auto=format&fit=crop&q=80&w=600',
-                tag: 'Novidade',
-              },
-            ].map((service, i) => (
-              <ServiceCard key={i} service={service} index={i} onBook={() => setIsBookingOpen(true)} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── ABOUT + STATS ────────────────────────────────────────────────── */}
-      <AboutSection />
-
-      {/* ── CTA BANNER ───────────────────────────────────────────────────── */}
-      <section className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="relative rounded-[40px] overflow-hidden p-16 text-center"
-            style={{ background: 'linear-gradient(135deg, #2A2621 0%, #3d3730 50%, #2A2621 100%)' }}
-          >
-            {/* Decorative circles */}
-            <div className="absolute top-0 right-0 w-96 h-96 rounded-full opacity-10"
-              style={{ background: 'radial-gradient(circle, #C9A96E 0%, transparent 70%)', transform: 'translate(30%, -30%)' }} />
-            <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full opacity-10"
-              style={{ background: 'radial-gradient(circle, #8FAF8E 0%, transparent 70%)', transform: 'translate(-30%, 30%)' }} />
-
-            <div className="relative z-10 space-y-6">
-              <p className="text-[10px] uppercase tracking-[0.3em] text-aura-gold font-bold">Pronta para se transformar?</p>
-              <h3 className="text-4xl md:text-5xl font-serif italic text-white">
-                Reserve seu horário hoje.
-              </h3>
-              <p className="text-white/50 font-light max-w-md mx-auto">
-                Consulta gratuita de 15 minutos para novos clientes. Agende agora e ganhe 10% de desconto na primeira visita.
-              </p>
-              <MagneticButton
-                onClick={() => setIsBookingOpen(true)}
-                className="mt-4 inline-flex items-center gap-2 bg-aura-gold text-aura-charcoal px-10 py-4 rounded-full text-[11px] uppercase tracking-widest font-bold hover:bg-aura-gold/90 transition-colors"
-              >
-                Agendar Agora
-                <ArrowUpRight className="w-4 h-4" />
-              </MagneticButton>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── FOOTER ───────────────────────────────────────────────────────── */}
-      <footer id="contato" className="bg-aura-charcoal text-white py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 pb-16">
-            <div className="space-y-6">
-              <h1 className="text-4xl font-serif italic">Studio Modesto</h1>
-              <p className="text-sm opacity-50 font-light leading-relaxed">
-                Transformando beleza em arte e bem-estar em estilo de vida desde 2020.
-              </p>
-              <div className="flex gap-4">
-                {[Instagram, Facebook].map((Icon, i) => (
-                  <motion.div
-                    key={i}
-                    whileHover={{ scale: 1.15, y: -2 }}
-                    className="w-9 h-9 rounded-full flex items-center justify-center cursor-pointer"
-                    style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)' }}
-                  >
-                    <Icon className="w-4 h-4 opacity-70" />
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <h5 className="text-[10px] uppercase tracking-widest font-bold opacity-30">Contato</h5>
-              <ul className="space-y-4 text-sm font-light">
-                <li className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity cursor-pointer">
-                  <Phone className="w-4 h-4 text-aura-gold flex-shrink-0" />
-                  (11) 99999-9999
-                </li>
-                <li className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity cursor-pointer">
-                  <MapPin className="w-4 h-4 text-aura-gold flex-shrink-0" />
-                  Av. Paulista, 1000 — SP
-                </li>
-              </ul>
-            </div>
-
-            <div className="space-y-6">
-              <h5 className="text-[10px] uppercase tracking-widest font-bold opacity-30">Horários</h5>
-              <ul className="space-y-4 text-sm font-light">
-                <li className="flex items-center gap-3 opacity-60">
-                  <Clock className="w-4 h-4 text-aura-gold flex-shrink-0" />
-                  Ter — Sáb: 09h às 20h
-                </li>
-                <li className="flex items-center gap-3 opacity-60">
-                  <Clock className="w-4 h-4 text-aura-gold flex-shrink-0" />
-                  Dom — Seg: Fechado
-                </li>
-              </ul>
-            </div>
-
-            <div className="space-y-6">
-              <h5 className="text-[10px] uppercase tracking-widest font-bold opacity-30">Newsletter</h5>
-              <p className="text-sm opacity-50 font-light">Receba novidades e promoções exclusivas.</p>
-              <div
-                className="flex items-center gap-2 p-1.5 rounded-full"
-                style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)' }}
-              >
-                <input
-                  placeholder="Seu e-mail"
-                  className="bg-transparent text-xs outline-none flex-1 px-3 placeholder:text-white/30 text-white/80"
-                />
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="p-2.5 bg-aura-gold rounded-full text-aura-charcoal flex-shrink-0"
-                >
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </motion.button>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className="pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4"
-            style={{ borderColor: 'rgba(255,255,255,0.08)' }}
-          >
-            <p className="text-[9px] uppercase tracking-widest opacity-30">
-              © 2026 Studio Modesto. Todos os direitos reservados.
-            </p>
-            <div className="flex gap-6">
-              {['Privacidade', 'Termos', 'Cookies'].map((item) => (
+            <div className="flex flex-col gap-8 items-center mt-10">
+              {navLinks.map((item) => (
                 <a
                   key={item}
-                  href="#"
-                  className="text-[9px] uppercase tracking-widest opacity-25 hover:opacity-60 transition-opacity"
+                  href={`#${item.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-4xl font-serif font-light text-aura-charcoal hover:text-aura-gold transition-colors"
                 >
                   {item}
                 </a>
               ))}
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── HERO EDITORIAL ────────────────────────────────────────────────── */}
+      <section id="inicio" className="min-h-screen pt-20 flex flex-col">
+        <div className="flex-1 max-w-[1600px] w-full mx-auto border-x border-editorial grid grid-cols-1 lg:grid-cols-12 relative">
+          
+          {/* Left Column: Massive Typography */}
+          <div className="lg:col-span-7 flex flex-col justify-center px-8 lg:px-16 py-20 lg:py-0 border-b lg:border-b-0 lg:border-r border-editorial">
+            <motion.p 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
+              className="text-[10px] uppercase tracking-[0.3em] font-medium text-aura-charcoal/50 mb-10"
+            >
+              Experiência Única de Beleza
+            </motion.p>
+            
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+              className="font-serif font-light text-aura-charcoal leading-[0.95]"
+              style={{ fontSize: 'clamp(4rem, 10vw, 8rem)' }}
+            >
+              Realce sua <br />
+              <span className="italic">essência</span> natural.
+            </motion.h1>
+
+            <motion.p 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+              className="mt-12 text-sm font-light leading-relaxed max-w-sm text-aura-charcoal/70"
+            >
+              Um refúgio de tranquilidade e sofisticação onde cada detalhe é pensado para o seu bem-estar. Menos excessos, mais significado.
+            </motion.p>
+
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="mt-16">
+              <MagneticButton onClick={() => setIsBookingOpen(true)} className="aura-button aura-button-primary">
+                Agendar Horário
+              </MagneticButton>
+            </motion.div>
+          </div>
+
+          {/* Right Column: Loose Image */}
+          <div className="lg:col-span-5 relative h-[60vh] lg:h-auto overflow-hidden bg-aura-charcoal/5">
+            <motion.div style={{ y: heroImageY }} className="absolute inset-0 h-[120%] -top-[10%]">
+              <img
+                src="https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80&w=1200"
+                alt="Salon Interior"
+                className="w-full h-full object-cover filter contrast-[1.05] grayscale-[0.2]"
+                referrerPolicy="no-referrer"
+              />
+            </motion.div>
           </div>
         </div>
-      </footer>
+      </section>
 
-      {/* ── BOOKING MODAL ────────────────────────────────────────────────── */}
+      <MarqueeStrip />
+
+      {/* ── SERVIÇOS (EDITORIAL ASYMMETRY) ────────────────────────────────── */}
+      <section id="servicos" className="py-32">
+        <div className="max-w-[1600px] mx-auto border-x border-editorial">
+          
+          <div className="px-8 lg:px-16 mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.3em] font-medium mb-6 text-aura-gold">Especialidades</p>
+              <h2 className="text-5xl md:text-7xl font-serif font-light leading-none">Cuidado em <br/><span className="italic">cada detalhe.</span></h2>
+            </div>
+            <button onClick={() => setIsBookingOpen(true)} className="flex items-center gap-2 text-[10px] uppercase tracking-widest hover:text-aura-gold transition-colors pb-2 border-b border-aura-charcoal">
+              Ver cardápio completo <ArrowUpRight className="w-3 h-3" />
+            </button>
+          </div>
+
+          {/* Service Items (Loose images, borders) */}
+          <div className="border-t border-editorial">
+            {[
+              {
+                title: 'Cabelo',
+                desc: 'Cortes arquitetônicos, coloração precisa e tratamentos profundos para fios saudáveis.',
+                img: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?auto=format&fit=crop&q=80&w=800',
+              },
+              {
+                title: 'Manicure & Pedicure',
+                desc: 'Esmaltação impecável e cuidados relaxantes com produtos de alta performance.',
+                img: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&q=80&w=800',
+              },
+              {
+                title: 'Estética Facial',
+                desc: 'Limpeza de pele e protocolos avançados para uma derme radiante e rejuvenescida.',
+                img: 'https://images.unsplash.com/photo-1570172619245-711f8ad1507f?auto=format&fit=crop&q=80&w=800',
+              },
+            ].map((service, i) => (
+              <div key={i} className="grid grid-cols-1 lg:grid-cols-2 border-b border-editorial group">
+                
+                {/* Alternate sides for images */}
+                <div className={`relative h-[50vh] lg:h-[70vh] overflow-hidden ${i % 2 !== 0 ? 'lg:order-2 lg:border-l' : 'lg:border-r'} border-editorial bg-aura-charcoal/5`}>
+                   <motion.img
+                      initial={{ scale: 1.05 }}
+                      whileInView={{ scale: 1 }}
+                      transition={{ duration: 1.5 }}
+                      src={service.img}
+                      alt={service.title}
+                      className="w-full h-full object-cover grayscale-[0.3]"
+                      referrerPolicy="no-referrer"
+                    />
+                </div>
+
+                <div className={`p-8 lg:p-20 flex flex-col justify-center ${i % 2 !== 0 ? 'lg:order-1' : ''}`}>
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-aura-charcoal/40 mb-8 block">0{i + 1}</span>
+                  <h3 className="text-4xl md:text-5xl font-serif font-light italic mb-6 group-hover:text-aura-gold transition-colors duration-500">
+                    {service.title}
+                  </h3>
+                  <p className="text-sm font-light leading-relaxed max-w-sm mb-12">
+                    {service.desc}
+                  </p>
+                  <button onClick={() => setIsBookingOpen(true)} className="self-start text-[10px] uppercase tracking-widest flex items-center gap-2 border-b border-aura-charcoal/20 pb-1 hover:border-aura-charcoal transition-colors">
+                    Agendar <ArrowUpRight className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── SOBRE (EDITORIAL WIREFRAME) ───────────────────────────────────── */}
+      <section id="sobre" className="border-y border-editorial">
+        <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 border-x border-editorial">
+          
+          <div className="lg:col-span-5 border-b lg:border-b-0 lg:border-r border-editorial p-8 lg:p-16 flex flex-col justify-between">
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.3em] font-medium mb-12 text-aura-gold">A Marca</p>
+              <h2 className="text-5xl lg:text-6xl font-serif font-light italic leading-none mb-8">Nossa Arte</h2>
+              <p className="text-sm font-light leading-relaxed max-w-sm mb-8 text-aura-charcoal/70">
+                Desde 2020 cultivamos um espaço onde técnica e estética convergem. Nossa abordagem foge de fórmulas prontas: lemos a individualidade de cada cliente para entregar resultados puros e atemporais.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-8 pt-12 border-t border-editorial">
+              <div>
+                <p className="text-4xl font-serif font-light mb-2">6+</p>
+                <p className="text-[9px] uppercase tracking-[0.2em] text-aura-charcoal/50">Anos de expertise</p>
+              </div>
+              <div>
+                <p className="text-4xl font-serif font-light mb-2">2K+</p>
+                <p className="text-[9px] uppercase tracking-[0.2em] text-aura-charcoal/50">Clientes atendidos</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-7 grid grid-rows-2">
+            <div className="border-b border-editorial h-[40vh] lg:h-[50vh] overflow-hidden">
+               <img
+                  src="https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&q=80&w=1000"
+                  alt="Detail"
+                  className="w-full h-full object-cover filter contrast-[1.05]"
+                  referrerPolicy="no-referrer"
+                />
+            </div>
+            <div className="h-[40vh] lg:h-[50vh] overflow-hidden">
+                <img
+                  src="https://images.unsplash.com/photo-1631730359585-a4a4e1a2ee06?auto=format&fit=crop&q=80&w=1000"
+                  alt="Treatment"
+                  className="w-full h-full object-cover filter contrast-[1.1] grayscale-[0.2]"
+                  referrerPolicy="no-referrer"
+                />
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── INVERTED CTA & FOOTER ────────────────────────────────────────── */}
+      <section id="contato" className="bg-aura-charcoal text-aura-cream pt-20">
+        <div className="max-w-[1600px] mx-auto border-x border-editorial-light">
+          
+          {/* CTA Drama */}
+          <div className="p-8 lg:p-32 border-b border-editorial-light text-center flex flex-col items-center">
+             <p className="text-[10px] uppercase tracking-[0.3em] font-medium text-aura-gold mb-8">Experimente</p>
+             <h3 className="text-5xl md:text-8xl font-serif font-light mb-16 leading-[1.1]">
+               Reserve o <br/><span className="italic text-aura-gold">Incomum.</span>
+             </h3>
+             <MagneticButton
+                onClick={() => setIsBookingOpen(true)}
+                className="bg-aura-gold text-aura-charcoal px-12 py-5 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-white transition-colors"
+              >
+                Agendar Horário
+              </MagneticButton>
+          </div>
+
+          {/* Footer Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-editorial-light">
+            <div className="p-8 lg:p-12">
+              <h4 className="text-2xl font-serif uppercase tracking-widest mb-6">Studio Modesto</h4>
+              <p className="text-xs font-light text-aura-cream/50 leading-relaxed">
+                Transformando beleza em arte desde 2020.
+              </p>
+            </div>
+            
+            <div className="p-8 lg:p-12">
+              <h5 className="text-[9px] uppercase tracking-[0.2em] font-bold mb-6 text-aura-gold">Contato</h5>
+              <ul className="space-y-4 text-xs font-light text-aura-cream/70">
+                <li className="flex items-center gap-3">
+                  <Phone className="w-3 h-3" /> (11) 99999-9999
+                </li>
+                <li className="flex items-center gap-3">
+                  <MapPin className="w-3 h-3" /> Av. Paulista, 1000 — SP
+                </li>
+              </ul>
+            </div>
+
+            <div className="p-8 lg:p-12">
+              <h5 className="text-[9px] uppercase tracking-[0.2em] font-bold mb-6 text-aura-gold">Horários</h5>
+              <ul className="space-y-4 text-xs font-light text-aura-cream/70">
+                <li className="flex items-center gap-3">
+                  <Clock className="w-3 h-3" /> Ter — Sáb: 09h às 20h
+                </li>
+              </ul>
+            </div>
+
+            <div className="p-8 lg:p-12">
+              <h5 className="text-[9px] uppercase tracking-[0.2em] font-bold mb-6 text-aura-gold">Social</h5>
+              <div className="flex gap-6">
+                <Instagram className="w-4 h-4 cursor-pointer hover:text-aura-gold transition-colors" />
+                <Facebook className="w-4 h-4 cursor-pointer hover:text-aura-gold transition-colors" />
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-6 border-t border-editorial-light text-center flex flex-col md:flex-row items-center justify-between">
+            <p className="text-[9px] uppercase tracking-widest text-aura-cream/30">
+              © {new Date().getFullYear()} Studio Modesto. Todos os direitos reservados.
+            </p>
+            <p className="text-[9px] uppercase tracking-widest text-aura-cream/30 flex items-center gap-2 mt-4 md:mt-0">
+              Desenvolvido com <Heart className="w-3 h-3 text-aura-gold" />
+            </p>
+          </div>
+
+        </div>
+      </section>
+
+      {/* Booking Portal Overlay */}
       <AnimatePresence>
-        {isBookingOpen && (
-          <BookingFlow isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />
-        )}
+        {isBookingOpen && <BookingFlow onClose={() => setIsBookingOpen(false)} />}
       </AnimatePresence>
     </div>
   );
