@@ -93,7 +93,7 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
 
   return (
     <div className="min-h-screen bg-aura-cream text-aura-charcoal font-sans">
-      
+
       {/* ── NAVBAR ────────────────────────────────────────────────────────── */}
       <nav className="fixed top-0 w-full z-50 bg-aura-cream/90 backdrop-blur-md border-b border-editorial">
         <div className="max-w-[1600px] mx-auto px-6 lg:px-12 h-20 flex items-center justify-between">
@@ -151,17 +151,17 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
       {/* ── HERO EDITORIAL ────────────────────────────────────────────────── */}
       <section id="inicio" className="min-h-screen pt-20 flex flex-col">
         <div className="flex-1 max-w-[1600px] w-full mx-auto border-x border-editorial grid grid-cols-1 lg:grid-cols-12 relative">
-          
+
           {/* Left Column: Massive Typography */}
           <div className="lg:col-span-7 flex flex-col justify-center px-8 lg:px-16 py-20 lg:py-0 border-b lg:border-b-0 lg:border-r border-editorial">
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
               className="text-[10px] uppercase tracking-[0.3em] font-medium text-aura-charcoal/50 mb-10"
             >
               Experiência Única de Beleza
             </motion.p>
-            
-            <motion.h1 
+
+            <motion.h1
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
               className="font-serif font-light text-aura-charcoal leading-[0.95]"
               style={{ fontSize: 'clamp(4rem, 10vw, 8rem)' }}
@@ -170,7 +170,7 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
               <span className="italic">essência</span> natural.
             </motion.h1>
 
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
               className="mt-12 text-sm font-light leading-relaxed max-w-sm text-aura-charcoal/70"
             >
@@ -178,15 +178,15 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
             </motion.p>
 
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="mt-16 flex flex-wrap gap-4">
-              <MagneticButton 
-                onClick={() => setIsBookingOpen(true)} 
+              <MagneticButton
+                onClick={() => setIsBookingOpen(true)}
                 className="aura-button bg-aura-charcoal text-aura-cream border border-aura-charcoal hover:bg-transparent hover:text-aura-charcoal cursor-pointer transition-colors"
               >
                 Agendar Horário
               </MagneticButton>
-              <a 
-                href="https://wa.me/5571992106043?text=Ol%C3%A1!%20Vim%20pelo%20site%20Studio%20Modesto%20e%20gostaria%20de%20tirar%20uma%20d%C3%BAvida." 
-                target="_blank" 
+              <a
+                href="https://wa.me/5571992106043?text=Ol%C3%A1!%20Vim%20pelo%20site%20Studio%20Modesto%20e%20gostaria%20de%20tirar%20uma%20d%C3%BAvida."
+                target="_blank"
                 rel="noopener noreferrer"
                 className="aura-button border border-aura-charcoal text-aura-charcoal hover:bg-aura-charcoal hover:text-aura-cream flex items-center justify-center"
               >
@@ -214,11 +214,11 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
       {/* ── SERVIÇOS (EDITORIAL ASYMMETRY) ────────────────────────────────── */}
       <section id="servicos" className="py-32">
         <div className="max-w-[1600px] mx-auto border-x border-editorial">
-          
+
           <div className="px-8 lg:px-16 mb-24 flex flex-col md:flex-row md:items-end justify-between gap-8">
             <div>
               <p className="text-[10px] uppercase tracking-[0.3em] font-medium mb-6 text-aura-gold">Especialidades</p>
-              <h2 className="text-5xl md:text-7xl font-serif font-light leading-none">Cuidado em <br/><span className="italic">cada detalhe.</span></h2>
+              <h2 className="text-5xl md:text-7xl font-serif font-light leading-none">Cuidado em <br /><span className="italic">cada detalhe.</span></h2>
             </div>
           </div>
 
@@ -242,18 +242,18 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
               },
             ].map((service, i) => (
               <div key={i} className="grid grid-cols-1 lg:grid-cols-2 border-b border-editorial group">
-                
+
                 {/* Alternate sides for images */}
                 <div className={`relative h-[50vh] lg:h-[70vh] overflow-hidden ${i % 2 !== 0 ? 'lg:order-2 lg:border-l' : 'lg:border-r'} border-editorial bg-aura-charcoal/5`}>
-                   <motion.img
-                      initial={{ scale: 1.05 }}
-                      whileInView={{ scale: 1 }}
-                      transition={{ duration: 1.5 }}
-                      src={service.img}
-                      alt={service.title}
-                      className="w-full h-full object-cover grayscale-[0.3]"
-                      referrerPolicy="no-referrer"
-                    />
+                  <motion.img
+                    initial={{ scale: 1.05 }}
+                    whileInView={{ scale: 1 }}
+                    transition={{ duration: 1.5 }}
+                    src={service.img}
+                    alt={service.title}
+                    className="w-full h-full object-cover grayscale-[0.3]"
+                    referrerPolicy="no-referrer"
+                  />
                 </div>
 
                 <div className={`p-8 lg:p-20 flex flex-col justify-center ${i % 2 !== 0 ? 'lg:order-1' : ''}`}>
@@ -277,16 +277,16 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
       {/* ── SOBRE (EDITORIAL WIREFRAME) ───────────────────────────────────── */}
       <section id="sobre" className="border-y border-editorial">
         <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 border-x border-editorial">
-          
+
           <div className="lg:col-span-5 border-b lg:border-b-0 lg:border-r border-editorial p-8 lg:p-16 flex flex-col justify-between">
             <div>
               <p className="text-[10px] uppercase tracking-[0.3em] font-medium mb-12 text-aura-gold">A Marca</p>
               <h2 className="text-5xl lg:text-6xl font-serif font-light italic leading-none mb-8">Nossa Arte</h2>
               <p className="text-sm font-light leading-relaxed max-w-sm mb-8 text-aura-charcoal/70">
-                Desde 2020 cultivamos um espaço onde técnica e estética convergem. Nossa abordagem foge de fórmulas prontas: lemos a individualidade de cada cliente para entregar resultados puros e atemporais.
+                Desde 2012 cultivamos um espaço onde técnica e estética convergem. Nossa abordagem foge de fórmulas prontas: lemos a individualidade de cada cliente para entregar resultados puros e atemporais.
               </p>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-8 pt-12 border-t border-editorial">
               <div>
                 <p className="text-4xl font-serif font-light mb-2">6+</p>
@@ -301,20 +301,20 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
 
           <div className="lg:col-span-7 grid grid-rows-2">
             <div className="border-b border-editorial h-[40vh] lg:h-[50vh] overflow-hidden">
-               <img
-                  src="https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&q=80&w=1000"
-                  alt="Detail"
-                  className="w-full h-full object-cover filter contrast-[1.05]"
-                  referrerPolicy="no-referrer"
-                />
+              <img
+                src="https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?auto=format&fit=crop&q=80&w=1000"
+                alt="Detail"
+                className="w-full h-full object-cover filter contrast-[1.05]"
+                referrerPolicy="no-referrer"
+              />
             </div>
             <div className="h-[40vh] lg:h-[50vh] overflow-hidden">
-                <img
-                  src="/treatment.png"
-                  alt="Treatment"
-                  className="w-full h-full object-cover filter contrast-[1.1] grayscale-[0.2]"
-                  referrerPolicy="no-referrer"
-                />
+              <img
+                src="/treatment.png"
+                alt="Treatment"
+                className="w-full h-full object-cover filter contrast-[1.1] grayscale-[0.2]"
+                referrerPolicy="no-referrer"
+              />
             </div>
           </div>
 
@@ -324,19 +324,19 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
       {/* ── INVERTED CTA & FOOTER ────────────────────────────────────────── */}
       <section id="contato" className="bg-aura-charcoal text-aura-cream pt-20">
         <div className="max-w-[1600px] mx-auto border-x border-editorial-light">
-          
+
           {/* CTA Drama */}
           <div className="p-8 lg:p-32 border-b border-editorial-light text-center flex flex-col items-center">
-             <p className="text-[10px] uppercase tracking-[0.3em] font-medium text-aura-gold mb-8">Experimente</p>
-             <h3 className="text-5xl md:text-8xl font-serif font-light mb-16 leading-[1.1]">
-               Reserve o <br/><span className="italic text-aura-gold">Incomum.</span>
-             </h3>
-             <MagneticButton
-                onClick={() => setIsBookingOpen(true)}
-                className="bg-aura-gold text-aura-charcoal px-12 py-5 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-white transition-colors"
-              >
-                Agendar Horário
-              </MagneticButton>
+            <p className="text-[10px] uppercase tracking-[0.3em] font-medium text-aura-gold mb-8">Experimente</p>
+            <h3 className="text-5xl md:text-8xl font-serif font-light mb-16 leading-[1.1]">
+              Reserve o <br /><span className="italic text-aura-gold">Incomum.</span>
+            </h3>
+            <MagneticButton
+              onClick={() => setIsBookingOpen(true)}
+              className="bg-aura-gold text-aura-charcoal px-12 py-5 text-[10px] uppercase tracking-[0.2em] font-bold hover:bg-white transition-colors"
+            >
+              Agendar Horário
+            </MagneticButton>
           </div>
 
           {/* Footer Grid */}
@@ -347,7 +347,7 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
                 Transformando beleza em arte desde 2020.
               </p>
             </div>
-            
+
             <div className="p-8 lg:p-12">
               <h5 className="text-[9px] uppercase tracking-[0.2em] font-bold mb-6 text-aura-gold">Contato</h5>
               <ul className="space-y-4 text-xs font-light text-aura-cream/70">
@@ -358,7 +358,7 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
                 </li>
                 <li>
                   <a href="https://maps.app.goo.gl/p9b7GNvHFQV6pj157" target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 hover:text-aura-gold transition-colors">
-                    <MapPin className="w-3 h-3 min-w-[12px] mt-0.5" /> <span>R. Duarte da Costa, 69 - Bonfim,<br/>Salvador - BA</span>
+                    <MapPin className="w-3 h-3 min-w-[12px] mt-0.5" /> <span>R. Duarte da Costa, 69 - Bonfim,<br />Salvador - BA</span>
                   </a>
                 </li>
               </ul>
@@ -386,7 +386,7 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
               </div>
             </div>
           </div>
-          
+
           <div className="p-6 border-t border-editorial-light text-center flex flex-col md:flex-row items-center justify-between">
             <p className="text-[9px] uppercase tracking-widest text-aura-cream/30">
               © {new Date().getFullYear()} Studio Modesto. Todos os direitos reservados.
