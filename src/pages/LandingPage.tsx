@@ -177,10 +177,18 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
               Um refúgio de tranquilidade e sofisticação onde cada detalhe é pensado para o seu bem-estar. Menos excessos, mais significado.
             </motion.p>
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="mt-16">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="mt-16 flex flex-wrap gap-4">
               <MagneticButton onClick={() => setIsBookingOpen(true)} className="aura-button aura-button-primary">
                 Agendar Horário
               </MagneticButton>
+              <a 
+                href="https://wa.me/5571992106043?text=Ol%C3%A1!%20Vim%20pelo%20site%20Studio%20Modesto%20e%20gostaria%20de%20tirar%20uma%20d%C3%BAvida." 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="aura-button border border-aura-charcoal text-aura-charcoal hover:bg-aura-charcoal hover:text-aura-cream flex items-center justify-center"
+              >
+                Fale conosco
+              </a>
             </motion.div>
           </div>
 

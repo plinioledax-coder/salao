@@ -32,8 +32,8 @@ export function Layout({ children, activeTab, setActiveTab, user, onViewSite }: 
     { id: 'professionals', label: 'Equipe', icon: Users },
     { id: 'inventory', label: 'Estoque', icon: Package },
     { id: 'finance', label: 'Financeiro', icon: Wallet },
-    { id: 'marketing', label: 'Marketing', icon: Megaphone },
-    { id: 'reports', label: 'Relatórios', icon: FileText },
+    { id: 'marketing', label: 'Marketing (BETA)', icon: Megaphone },
+    { id: 'reports', label: 'Relatórios (BETA)', icon: FileText },
   ];
 
   return (
