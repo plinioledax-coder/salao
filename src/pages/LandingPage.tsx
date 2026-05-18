@@ -178,7 +178,10 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
             </motion.p>
 
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="mt-16 flex flex-wrap gap-4">
-              <MagneticButton onClick={() => setIsBookingOpen(true)} className="aura-button aura-button-primary">
+              <MagneticButton 
+                onClick={() => setIsBookingOpen(true)} 
+                className="aura-button bg-aura-charcoal text-aura-cream border border-aura-charcoal hover:bg-transparent hover:text-aura-charcoal cursor-pointer transition-colors"
+              >
                 Agendar Horário
               </MagneticButton>
               <a 
