@@ -12,6 +12,7 @@ import {
   Heart,
 } from 'lucide-react';
 import { BookingFlow } from './BookingFlow';
+import { FloatingWhatsApp } from '../components/FloatingWhatsApp';
 
 /* ─────────────────────────────────────────────────────────────────────────────
    MAGNETIC BUTTON (Keep for premium interaction but on sharp elements)
@@ -208,9 +209,6 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
               <p className="text-[10px] uppercase tracking-[0.3em] font-medium mb-6 text-aura-gold">Especialidades</p>
               <h2 className="text-5xl md:text-7xl font-serif font-light leading-none">Cuidado em <br/><span className="italic">cada detalhe.</span></h2>
             </div>
-            <button onClick={() => setIsBookingOpen(true)} className="flex items-center gap-2 text-[10px] uppercase tracking-widest hover:text-aura-gold transition-colors pb-2 border-b border-aura-charcoal">
-              Ver cardápio completo <ArrowUpRight className="w-3 h-3" />
-            </button>
           </div>
 
           {/* Service Items (Loose images, borders) */}
@@ -229,7 +227,7 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
               {
                 title: 'Estética Facial',
                 desc: 'Limpeza de pele e protocolos avançados para uma derme radiante e rejuvenescida.',
-                img: 'https://images.unsplash.com/photo-1570172619245-711f8ad1507f?auto=format&fit=crop&q=80&w=800',
+                img: '/facial.png',
               },
             ].map((service, i) => (
               <div key={i} className="grid grid-cols-1 lg:grid-cols-2 border-b border-editorial group">
@@ -301,7 +299,7 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
             </div>
             <div className="h-[40vh] lg:h-[50vh] overflow-hidden">
                 <img
-                  src="https://images.unsplash.com/photo-1631730359585-a4a4e1a2ee06?auto=format&fit=crop&q=80&w=1000"
+                  src="/treatment.png"
                   alt="Treatment"
                   className="w-full h-full object-cover filter contrast-[1.1] grayscale-[0.2]"
                   referrerPolicy="no-referrer"
@@ -342,11 +340,15 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
             <div className="p-8 lg:p-12">
               <h5 className="text-[9px] uppercase tracking-[0.2em] font-bold mb-6 text-aura-gold">Contato</h5>
               <ul className="space-y-4 text-xs font-light text-aura-cream/70">
-                <li className="flex items-center gap-3">
-                  <Phone className="w-3 h-3" /> (11) 99999-9999
+                <li>
+                  <a href="https://wa.me/5571992106043?text=Ol%C3%A1!%20Vim%20pelo%20site%20Studio%20Modesto%20e%20gostaria%20de%20agendar%20um%20hor%C3%A1rio." target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-aura-gold transition-colors">
+                    <Phone className="w-3 h-3 min-w-[12px]" /> (71) 99210-6043
+                  </a>
                 </li>
-                <li className="flex items-center gap-3">
-                  <MapPin className="w-3 h-3" /> Av. Paulista, 1000 — SP
+                <li>
+                  <a href="https://maps.app.goo.gl/p9b7GNvHFQV6pj157" target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 hover:text-aura-gold transition-colors">
+                    <MapPin className="w-3 h-3 min-w-[12px] mt-0.5" /> <span>R. Duarte da Costa, 69 - Bonfim,<br/>Salvador - BA</span>
+                  </a>
                 </li>
               </ul>
             </div>
@@ -355,7 +357,10 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
               <h5 className="text-[9px] uppercase tracking-[0.2em] font-bold mb-6 text-aura-gold">Horários</h5>
               <ul className="space-y-4 text-xs font-light text-aura-cream/70">
                 <li className="flex items-center gap-3">
-                  <Clock className="w-3 h-3" /> Ter — Sáb: 09h às 20h
+                  <Clock className="w-3 h-3 min-w-[12px]" /> Seg - Sex: 09h às 18h
+                </li>
+                <li className="flex items-center gap-3">
+                  <span className="w-3 min-w-[12px]"></span> Sáb: 09h às 13:00
                 </li>
               </ul>
             </div>
@@ -363,7 +368,9 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
             <div className="p-8 lg:p-12">
               <h5 className="text-[9px] uppercase tracking-[0.2em] font-bold mb-6 text-aura-gold">Social</h5>
               <div className="flex gap-6">
-                <Instagram className="w-4 h-4 cursor-pointer hover:text-aura-gold transition-colors" />
+                <a href="https://www.instagram.com/_studiomodesto/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                  <Instagram className="w-4 h-4 cursor-pointer hover:text-aura-gold transition-colors" />
+                </a>
                 <Facebook className="w-4 h-4 cursor-pointer hover:text-aura-gold transition-colors" />
               </div>
             </div>
@@ -373,8 +380,8 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
             <p className="text-[9px] uppercase tracking-widest text-aura-cream/30">
               © {new Date().getFullYear()} Studio Modesto. Todos os direitos reservados.
             </p>
-            <p className="text-[9px] uppercase tracking-widest text-aura-cream/30 flex items-center gap-2 mt-4 md:mt-0">
-              Desenvolvido com <Heart className="w-3 h-3 text-aura-gold" />
+            <p className="text-[9px] uppercase tracking-widest text-aura-cream/30 mt-4 md:mt-0">
+              Desenvolvido por <a href="https://www.apertef1.com.br" target="_blank" rel="noopener noreferrer" className="text-aura-gold hover:text-white transition-colors">Aperte F1</a>
             </p>
           </div>
 
@@ -383,8 +390,10 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
 
       {/* Booking Portal Overlay */}
       <AnimatePresence>
-        {isBookingOpen && <BookingFlow onClose={() => setIsBookingOpen(false)} />}
+        {isBookingOpen && <BookingFlow isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />}
       </AnimatePresence>
+
+      <FloatingWhatsApp />
     </div>
   );
 }

@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { cn } from '../../utils/cn'; // Supondo que você tenha ou criará um utilitário para o cn
+import { supabase } from '../../services/supabase';
+import { Appointment } from '../../types';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { cn } from '../../utils/cn';
 import { 
   LayoutDashboard, Calendar as CalendarIcon, Package, Wallet, 
   Users, Megaphone, LogOut, User as UserIcon, Bell, FileText, ExternalLink 
@@ -22,6 +26,46 @@ export function Layout() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [pendingAppointments, setPendingAppointments] = useState<Appointment[]>([]);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const notificationsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const fetchPending = async () => {
+      const { data } = await supabase
+        .from('appointments')
+        .select('*')
+        .eq('status', 'scheduled')
+        .gte('start_time', new Date().toISOString())
+        .order('created_at', { ascending: false })
+        .limit(5);
+      
+      if (data) setPendingAppointments(data);
+    };
+    
+    fetchPending();
+    
+    const subscription = supabase
+      .channel('appointments-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'appointments' }, () => {
+        fetchPending();
+      })
+      .subscribe();
+      
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setIsNotificationsOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    return () => {
+      supabase.removeChannel(subscription);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleLogout = async () => {
     await signOut();
@@ -86,10 +130,57 @@ export function Layout() {
             {menuItems.find(i => location.pathname.includes(i.path))?.label || 'Painel'}
           </h2>
           <div className="flex items-center gap-4">
-            <button className="p-2 text-aura-charcoal/40 hover:text-aura-charcoal transition-colors relative">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-aura-gold rounded-full border-2 border-white"></span>
-            </button>
+            <div className="relative" ref={notificationsRef}>
+              <button 
+                onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                className="p-2 text-aura-charcoal/40 hover:text-aura-charcoal transition-colors relative"
+              >
+                <Bell className="w-5 h-5" />
+                {pendingAppointments.length > 0 && (
+                  <span className="absolute top-2 right-2 w-2 h-2 bg-aura-gold rounded-full border-2 border-white animate-pulse"></span>
+                )}
+              </button>
+              
+              {isNotificationsOpen && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-aura-charcoal/5 overflow-hidden z-50">
+                  <div className="p-4 border-b border-aura-charcoal/5 bg-aura-cream/30">
+                    <h3 className="font-serif text-aura-charcoal">Notificações</h3>
+                    <p className="text-[10px] uppercase tracking-widest text-aura-charcoal/50 mt-1">
+                      {pendingAppointments.length} agendamento(s) pendente(s)
+                    </p>
+                  </div>
+                  <div className="max-h-80 overflow-y-auto">
+                    {pendingAppointments.length === 0 ? (
+                      <div className="p-6 text-center text-sm text-aura-charcoal/40">
+                        Nenhuma pendência no momento.
+                      </div>
+                    ) : (
+                      pendingAppointments.map(appt => (
+                        <div key={appt.id} className="p-4 border-b border-aura-charcoal/5 hover:bg-aura-soft-gray transition-colors">
+                          <p className="text-sm font-medium text-aura-charcoal truncate">Novo Agendamento: {appt.customer_name}</p>
+                          <p className="text-xs text-aura-charcoal/60 mt-1">
+                            {format(new Date(appt.start_time), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
+                          </p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  {pendingAppointments.length > 0 && (
+                    <div className="p-3 bg-aura-soft-gray text-center border-t border-aura-charcoal/5">
+                      <button 
+                        onClick={() => {
+                          setIsNotificationsOpen(false);
+                          navigate('/admin/calendar');
+                        }}
+                        className="text-xs font-medium text-aura-charcoal hover:text-aura-gold transition-colors"
+                      >
+                        Ver na Agenda
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             <div className="h-8 w-[1px] bg-aura-charcoal/10 mx-2"></div>
             <div className="text-right">
               <p className="text-[10px] uppercase tracking-widest text-aura-charcoal/40">Data de Hoje</p>
