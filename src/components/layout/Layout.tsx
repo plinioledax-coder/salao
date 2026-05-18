@@ -125,7 +125,7 @@ export function Layout() {
       </aside>
 
       <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-20 bg-white/50 backdrop-blur-sm border-b border-aura-charcoal/5 flex items-center justify-between px-10">
+        <header className="h-20 bg-white/50 backdrop-blur-sm border-b border-aura-charcoal/5 flex items-center justify-between px-10 relative z-50">
           <h2 className="text-xl font-serif text-aura-charcoal capitalize">
             {menuItems.find(i => location.pathname.includes(i.path))?.label || 'Painel'}
           </h2>
