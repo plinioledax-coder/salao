@@ -289,11 +289,11 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
 
             <div className="grid grid-cols-2 gap-8 pt-12 border-t border-editorial">
               <div>
-                <p className="text-4xl font-serif font-light mb-2">6+</p>
+                <p className="text-4xl font-serif font-light mb-2">14+</p>
                 <p className="text-[9px] uppercase tracking-[0.2em] text-aura-charcoal/50">Anos de expertise</p>
               </div>
               <div>
-                <p className="text-4xl font-serif font-light mb-2">2K+</p>
+                <p className="text-4xl font-serif font-light mb-2">1000+</p>
                 <p className="text-[9px] uppercase tracking-[0.2em] text-aura-charcoal/50">Clientes atendidos</p>
               </div>
             </div>
@@ -344,7 +344,7 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
             <div className="p-8 lg:p-12">
               <h4 className="text-2xl font-serif uppercase tracking-widest mb-6">Studio Modesto</h4>
               <p className="text-xs font-light text-aura-cream/50 leading-relaxed">
-                Transformando beleza em arte desde 2020.
+                Transformando beleza em arte desde 2012.
               </p>
             </div>
 
