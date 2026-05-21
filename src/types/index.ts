@@ -19,6 +19,7 @@ export interface Professional {
   commission_rate: number;
   goals_monthly_revenue: number;
   goals_appointments: number;
+  off_days?: number[]; // Dias de folga recorrentes (0 = Domingo, 1 = Segunda, etc.)
   created_at: string;
 }
 

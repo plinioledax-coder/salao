@@ -88,3 +88,18 @@ export async function getCustomerCRMData(customerId: string, customerName: strin
     favoriteProfessional
   };
 }
+
+export async function getCustomerByPhone(phone: string): Promise<Customer | null> {
+  const cleanPhone = phone.replace(/\D/g, '');
+  if (!cleanPhone) return null;
+
+  const { data, error } = await supabase
+    .from('customers')
+    .select('*');
+
+  if (error) throw new Error(error.message);
+
+  // Procura por correspondência exata de números (removendo formatação do banco também)
+  const customer = data?.find(c => (c.phone || '').replace(/\D/g, '') === cleanPhone) || null;
+  return customer;
+}

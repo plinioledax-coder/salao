@@ -123,7 +123,7 @@ salao/
 │   │   ├── layout/         # Layout geral do painel, cabeçalho e navegação lateral
 │   │   └── FloatingWhatsApp.tsx
 │   ├── contexts/           # Provedores de Estado (ex: Autenticação, Agendamentos)
-│   ├── lib/                # Configurações de clientes externos (Firebase/Supabase)
+│   ├── lib/                # Configurações de clientes externos (Supabase)
 │   ├── pages/              # Páginas e fluxos principais
 │   │   ├── BookingFlow.tsx      # Fluxo guiado de agendamentos
 │   │   ├── Dashboard.tsx        # Gráficos e cards de performance

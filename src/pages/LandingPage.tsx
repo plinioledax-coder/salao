@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { BookingFlow } from './BookingFlow';
 import { FloatingWhatsApp } from '../components/FloatingWhatsApp';
+import { LoyaltyModal } from '../components/LoyaltyModal';
 
 /* ─────────────────────────────────────────────────────────────────────────────
    MAGNETIC BUTTON (Keep for premium interaction but on sharp elements)
@@ -86,10 +87,11 @@ interface LandingPageProps {
 export function LandingPage({ onEnterPortal }: LandingPageProps) {
   const [isBookingOpen, setIsBookingOpen] = React.useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [isLoyaltyOpen, setIsLoyaltyOpen] = React.useState(false);
   const { scrollY } = useScroll();
   const heroImageY = useTransform(scrollY, [0, 800], [0, 120]);
 
-  const navLinks = ['Início', 'Serviços', 'Sobre', 'Contato'];
+  const navLinks = ['Início', 'Serviços', 'Fidelidade', 'Sobre', 'Contato'];
 
   return (
     <div className="min-h-screen bg-aura-cream text-aura-charcoal font-sans">
@@ -102,15 +104,28 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
           </div>
 
           <div className="hidden md:flex items-center gap-12">
-            {navLinks.map((item) => (
-              <a
-                key={item}
-                href={`#${item.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`}
-                className="text-[10px] uppercase tracking-[0.2em] hover:text-aura-gold transition-colors duration-300"
-              >
-                {item}
-              </a>
-            ))}
+            {navLinks.map((item) => {
+              if (item === 'Fidelidade') {
+                return (
+                  <button
+                    key={item}
+                    onClick={() => setIsLoyaltyOpen(true)}
+                    className="text-[10px] uppercase tracking-[0.2em] hover:text-aura-gold transition-colors duration-300 cursor-pointer bg-transparent border-none p-0"
+                  >
+                    {item}
+                  </button>
+                );
+              }
+              return (
+                <a
+                  key={item}
+                  href={`#${item.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`}
+                  className="text-[10px] uppercase tracking-[0.2em] hover:text-aura-gold transition-colors duration-300"
+                >
+                  {item}
+                </a>
+              );
+            })}
           </div>
 
           <button
@@ -133,16 +148,32 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
             className="fixed inset-0 z-40 bg-aura-cream pt-24 px-6 md:hidden border-b border-editorial"
           >
             <div className="flex flex-col gap-8 items-center mt-10">
-              {navLinks.map((item) => (
-                <a
-                  key={item}
-                  href={`#${item.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-4xl font-serif font-light text-aura-charcoal hover:text-aura-gold transition-colors"
-                >
-                  {item}
-                </a>
-              ))}
+              {navLinks.map((item) => {
+                if (item === 'Fidelidade') {
+                  return (
+                    <button
+                      key={item}
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        setIsLoyaltyOpen(true);
+                      }}
+                      className="text-4xl font-serif font-light text-aura-charcoal hover:text-aura-gold transition-colors bg-transparent border-none p-0 cursor-pointer"
+                    >
+                      {item}
+                    </button>
+                  );
+                }
+                return (
+                  <a
+                    key={item}
+                    href={`#${item.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-4xl font-serif font-light text-aura-charcoal hover:text-aura-gold transition-colors"
+                  >
+                    {item}
+                  </a>
+                );
+              })}
             </div>
           </motion.div>
         )}
@@ -402,6 +433,11 @@ export function LandingPage({ onEnterPortal }: LandingPageProps) {
       {/* Booking Portal Overlay */}
       <AnimatePresence>
         {isBookingOpen && <BookingFlow isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} />}
+      </AnimatePresence>
+
+      {/* Loyalty Portal Overlay */}
+      <AnimatePresence>
+        {isLoyaltyOpen && <LoyaltyModal isOpen={isLoyaltyOpen} onClose={() => setIsLoyaltyOpen(false)} />}
       </AnimatePresence>
 
       <FloatingWhatsApp />

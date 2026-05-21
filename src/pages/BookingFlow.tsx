@@ -20,6 +20,7 @@ import { cn } from "../utils/cn"; // Ajusta o caminho se necessário
 import { getActiveServices } from "../services/api/services";
 import { getProfessionals } from "../services/api/professionals";
 import { createAppointment } from "../services/api/appointments";
+import { getCustomerByPhone } from "../services/api/customers";
 import { Service, Professional } from "../types";
 
 interface BookingFlowProps {
@@ -56,6 +57,60 @@ export function BookingFlow({ isOpen, onClose }: BookingFlowProps) {
   );
   const [selectedTime, setSelectedTime] = useState("");
   const [customerInfo, setCustomerInfo] = useState({ name: '', phone: '', email: '', birthday: '' });
+
+  // Estados do CRM e Fidelidade
+  const [pointsFound, setPointsFound] = useState<number | null>(null);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [welcomeName, setWelcomeName] = useState<string | null>(null);
+
+  // Formata o telefone em tempo real: (XX) XXXXX-XXXX
+  const formatPhone = (val: string) => {
+    let value = val.replace(/\D/g, '');
+    if (value.length > 11) value = value.slice(0, 11);
+    
+    if (value.length > 6) {
+      return `(${value.slice(0, 2)}) ${value.slice(2, 7)}-${value.slice(7)}`;
+    } else if (value.length > 2) {
+      return `(${value.slice(0, 2)}) ${value.slice(2)}`;
+    } else if (value.length > 0) {
+      return `(${value}`;
+    }
+    return value;
+  };
+
+  useEffect(() => {
+    const cleanPhone = customerInfo.phone.replace(/\D/g, "");
+    if (cleanPhone.length >= 10) {
+      const lookup = async () => {
+        setSearchLoading(true);
+        try {
+          const customer = await getCustomerByPhone(cleanPhone);
+          if (customer) {
+            setPointsFound(customer.loyalty_points);
+            setWelcomeName(customer.name);
+            // Preenche automaticamente os campos que estão em branco
+            setCustomerInfo(prev => ({
+              ...prev,
+              name: prev.name || customer.name,
+              email: prev.email || customer.email || "",
+              birthday: prev.birthday || customer.birthday || "",
+            }));
+          } else {
+            setPointsFound(null);
+            setWelcomeName(null);
+          }
+        } catch (err) {
+          console.error("Erro ao buscar fidelidade:", err);
+        } finally {
+          setSearchLoading(false);
+        }
+      };
+      lookup();
+    } else {
+      setPointsFound(null);
+      setWelcomeName(null);
+    }
+  }, [customerInfo.phone]);
 
   // Carrega os dados quando o modal abre
   useEffect(() => {
@@ -258,7 +313,14 @@ export function BookingFlow({ isOpen, onClose }: BookingFlowProps) {
                     {/* Opção Qualquer Profissional (Pega o primeiro da lista) */}
                     <button
                       onClick={() => {
-                        setSelectedProf(professionals[0]);
+                        const prof = professionals[0];
+                        setSelectedProf(prof);
+                        // Se a data atual for folga do profissional, avança para o próximo dia ativo
+                        let checkDate = startOfDay(addDays(new Date(), 1));
+                        while (prof?.off_days?.includes(checkDate.getDay())) {
+                          checkDate = addDays(checkDate, 1);
+                        }
+                        setSelectedDate(checkDate);
                         setStep(3);
                       }}
                       className="flex items-center gap-4 p-6 rounded-2xl border bg-white/50 border-aura-charcoal/5 hover:border-aura-gold/30 hover:bg-white transition-all text-left group"
@@ -281,6 +343,12 @@ export function BookingFlow({ isOpen, onClose }: BookingFlowProps) {
                         key={prof.id}
                         onClick={() => {
                           setSelectedProf(prof);
+                          // Se a data atual for folga do profissional, avança para o próximo dia ativo
+                          let checkDate = startOfDay(addDays(new Date(), 1));
+                          while (prof.off_days?.includes(checkDate.getDay())) {
+                            checkDate = addDays(checkDate, 1);
+                          }
+                          setSelectedDate(checkDate);
                           setStep(3);
                         }}
                         className={cn(
@@ -336,13 +404,17 @@ export function BookingFlow({ isOpen, onClose }: BookingFlowProps) {
                       <div className="grid grid-cols-3 gap-2">
                         {Array.from({ length: 6 }).map((_, i) => {
                           const date = addDays(new Date(), i + 1);
+                          const isOffDay = selectedProf?.off_days?.includes(date.getDay());
                           return (
                             <button
                               key={i}
+                              disabled={isOffDay}
                               onClick={() => setSelectedDate(startOfDay(date))}
                               className={cn(
-                                "p-3 rounded-xl border text-center transition-all",
-                                isSameDay(selectedDate, date)
+                                "p-3 rounded-xl border text-center transition-all relative overflow-hidden",
+                                isOffDay
+                                  ? "bg-aura-charcoal/5 border-dashed border-aura-charcoal/10 text-aura-charcoal/20 cursor-not-allowed"
+                                  : isSameDay(selectedDate, date)
                                   ? "bg-aura-charcoal text-white border-aura-charcoal shadow-md"
                                   : "bg-white border-aura-charcoal/5 hover:border-aura-gold/30",
                               )}
@@ -351,8 +423,11 @@ export function BookingFlow({ isOpen, onClose }: BookingFlowProps) {
                                 {format(date, "EEE", { locale: ptBR })}
                               </p>
                               <p className="font-serif text-lg">
-                                {format(date, "d")}
+                                {isOffDay ? "Folga" : format(date, "d")}
                               </p>
+                              {isOffDay && (
+                                <div className="absolute inset-0 bg-linear-to-tr from-transparent via-aura-charcoal/[0.03] to-transparent pointer-events-none" />
+                              )}
                             </button>
                           );
                         })}
@@ -457,15 +532,42 @@ export function BookingFlow({ isOpen, onClose }: BookingFlowProps) {
                         </label>
                         <input
                           required
+                          placeholder="(71) 99999-9999"
                           className="w-full bg-white border border-aura-charcoal/5 rounded-xl px-4 py-3 outline-none focus:border-aura-gold/50 transition-colors"
                           value={customerInfo.phone}
                           onChange={(e) =>
                             setCustomerInfo({
                               ...customerInfo,
-                              phone: e.target.value,
+                              phone: formatPhone(e.target.value),
                             })
                           }
                         />
+                        {searchLoading && (
+                          <p className="text-[9px] text-aura-gold flex items-center gap-1.5 mt-1 font-medium tracking-wide uppercase">
+                            <Loader2 className="w-3 h-3 animate-spin" /> Verificando cadastro...
+                          </p>
+                        )}
+                        {!searchLoading && pointsFound !== null && (
+                          <motion.div
+                            initial={{ opacity: 0, y: -5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-white border border-aura-gold/20 shadow-sm rounded-xl p-3 mt-2 flex items-center justify-between"
+                          >
+                            <div className="flex flex-col">
+                              <span className="text-[9px] text-aura-gold uppercase tracking-widest font-bold flex items-center gap-1">
+                                <Sparkles className="w-3 h-3 animate-pulse" /> Membro Fidelidade
+                              </span>
+                              {welcomeName && (
+                                <span className="text-xs font-serif font-light text-aura-charcoal mt-0.5">
+                                  Olá, {welcomeName.split(' ')[0]}!
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-xs font-serif font-bold text-aura-gold bg-aura-gold/5 px-2.5 py-1 rounded-full border border-aura-gold/20">
+                              {pointsFound} Pts
+                            </span>
+                          </motion.div>
+                        )}
                       </div>
                       <div className="space-y-1">
                         <label className="text-[10px] uppercase tracking-widest text-aura-charcoal/40">

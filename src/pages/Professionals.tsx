@@ -87,7 +87,7 @@ export function Professionals() {
     setSelectedProf(null);
     setIsCreating(true);
     setIsEditing(true);
-    setEditForm({ name: '', role: '', commission_rate: 0, active: true, specialties: [] });
+    setEditForm({ name: '', role: '', commission_rate: 0, active: true, specialties: [], off_days: [0] });
     setSpecialtiesInput('');
   };
 
@@ -197,6 +197,17 @@ export function Professionals() {
                   <h3 className="text-2xl font-serif text-aura-charcoal">{selectedProf.name}</h3>
                   <p className="text-xs text-aura-charcoal/60 uppercase tracking-widest font-bold">{selectedProf.role}</p>
                   
+                  {/* Lista de folgas semanais */}
+                  {selectedProf.off_days && selectedProf.off_days.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 justify-center mt-2">
+                      {selectedProf.off_days.map(d => (
+                        <span key={d} className="text-[9px] px-2 py-0.5 rounded bg-aura-gold/10 border border-aura-gold/20 text-aura-gold font-bold uppercase tracking-widest">
+                          {["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"][d]}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  
                   {!selectedProf.active && <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest mt-2 inline-flex items-center gap-1"><PowerOff className="w-3 h-3"/> Conta Inativada</p>}
                 </div>
 
@@ -290,6 +301,44 @@ export function Professionals() {
                       onChange={e => setSpecialtiesInput(e.target.value)} 
                       placeholder="Ex: Corte Feminino, Coloração, Escova..." 
                     />
+                  </div>
+
+                  {/* Escala & Folgas Semanais Checkboxes */}
+                  <div className="space-y-2 pt-2 border-t border-aura-charcoal/10">
+                    <label className="text-[10px] uppercase tracking-widest text-aura-charcoal/40 font-bold block mb-2">
+                      Escala & Folgas Semanais
+                    </label>
+                    <div className="flex justify-between gap-1">
+                      {["D", "S", "T", "Q", "Q", "S", "S"].map((dayLetter, dayIdx) => {
+                        const isOffDay = (editForm.off_days || []).includes(dayIdx);
+                        const dayName = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"][dayIdx];
+                        return (
+                          <button
+                            key={dayIdx}
+                            type="button"
+                            title={`Folga em ${dayName}`}
+                            onClick={() => {
+                              const current = editForm.off_days || [];
+                              const updated = current.includes(dayIdx)
+                                ? current.filter(d => d !== dayIdx)
+                                : [...current, dayIdx];
+                              setEditForm({ ...editForm, off_days: updated });
+                            }}
+                            className={cn(
+                              "w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all border cursor-pointer",
+                              isOffDay
+                                ? "bg-aura-gold text-white border-aura-gold shadow-md"
+                                : "bg-white border-aura-charcoal/10 text-aura-charcoal hover:border-aura-gold/50"
+                            )}
+                          >
+                            {dayLetter}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="text-[9px] text-aura-charcoal/40 text-center mt-1">
+                      Selecione os dias em que o profissional estará de folga.
+                    </p>
                   </div>
 
                   <div className="pt-2 border-t border-aura-charcoal/10">

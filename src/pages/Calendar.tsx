@@ -281,64 +281,84 @@ export function Calendar() {
         </div>
       ) : (
         <div className={cn("grid gap-6", viewMode === 'week' ? "grid-cols-7" : "grid-cols-1 max-w-3xl mx-auto")}>
-          {weekDays.map((day, i) => (
-            <div key={i} className="space-y-4">
-              <div className={cn(
-                "text-center p-4 rounded-3xl border transition-all",
-                isSameDay(day, new Date()) ? "bg-aura-charcoal text-white border-aura-charcoal shadow-md scale-105" : "bg-white/50 border-aura-charcoal/5"
-              )}>
-                <p className={cn("text-[10px] uppercase tracking-widest", isSameDay(day, new Date()) ? "text-aura-gold" : "text-aura-charcoal/40")}>
-                  {format(day, "EEE", { locale: ptBR })}
-                </p>
-                <p className="text-xl font-serif mt-1">{format(day, "d")}</p>
+          {weekDays.map((day, i) => {
+            const profObj = selectedProf !== 'all' ? professionals.find(p => p.id === selectedProf) : null;
+            const isOffDayForProf = profObj?.off_days?.includes(day.getDay());
+
+            return (
+              <div key={i} className="space-y-4">
+                <div className={cn(
+                  "text-center p-4 rounded-3xl border transition-all relative overflow-hidden",
+                  isOffDayForProf ? "bg-aura-gold/5 border-aura-gold/20" : 
+                  isSameDay(day, new Date()) ? "bg-aura-charcoal text-white border-aura-charcoal shadow-md scale-105" : "bg-white/50 border-aura-charcoal/5"
+                )}>
+                  <p className={cn("text-[10px] uppercase tracking-widest", isOffDayForProf ? "text-aura-gold" : isSameDay(day, new Date()) ? "text-aura-gold" : "text-aura-charcoal/40")}>
+                    {format(day, "EEE", { locale: ptBR })}
+                  </p>
+                  <p className="text-xl font-serif mt-1">{format(day, "d")}</p>
+                  {isOffDayForProf && (
+                    <div className="absolute top-0 right-0 w-2 h-2 mt-1 mr-1 rounded-full bg-aura-gold opacity-50" />
+                  )}
+                </div>
+
+                <div className="space-y-3 min-h-[500px]">
+                  {isOffDayForProf && (
+                    <div className="p-4 border border-dashed border-aura-gold/20 bg-linear-to-tr from-aura-gold/[0.03] to-transparent rounded-2xl flex flex-col items-center justify-center text-center space-y-1.5 py-10 relative overflow-hidden">
+                      <Ban className="w-4 h-4 text-aura-gold/50" />
+                      <span className="text-[9px] uppercase tracking-[0.15em] font-bold text-aura-gold">FOLGA RECORRENTE</span>
+                      <span className="text-[8px] text-aura-charcoal/30 uppercase tracking-wider">Stylist Inativo</span>
+                    </div>
+                  )}
+
+                  {appointments
+                    .filter(a => isSameDay(new Date(a.start_time), day))
+                    .filter(a => selectedProf === 'all' || a.professional_id === selectedProf)
+                    .map((appt) => (
+                      <motion.div
+                        layout
+                        key={appt.id}
+                        onClick={() => openModalForEdit(appt)}
+                        className={cn(
+                          "glass-card p-4 border-l-4 transition-all cursor-pointer hover:scale-[1.02]",
+                          getStatusStyles(appt.status)
+                        )}
+                      >
+                        {appt.status === 'scheduled' && (
+                          <div className="absolute top-0 right-0 w-2 h-2 mt-2 mr-2 rounded-full bg-aura-gold animate-ping opacity-75"></div>
+                        )}
+
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="text-[10px] font-bold text-aura-charcoal/60 flex items-center gap-1">
+                            {getStatusIcon(appt.status)}
+                            {format(new Date(appt.start_time), "HH:mm")}
+                          </span>
+                          {appt.price > 0 && <span className="text-[10px] font-bold text-aura-sage">R$ {appt.price}</span>}
+                        </div>
+
+                        <p className="font-serif text-sm mb-1 truncate leading-tight text-aura-charcoal">{appt.customer_name}</p>
+                        <p className="text-[10px] text-aura-charcoal/50 uppercase tracking-wider truncate mb-2" title={appt.service_name}>
+                          {appt.service_name || (appt.is_blocked ? 'INDISPONÍVEL' : 'Serviço')}
+                        </p>
+
+                        <div className="inline-block mt-1 px-2 py-0.5 rounded bg-white/50 border border-white/20">
+                          <span className="text-[8px] font-bold uppercase tracking-widest text-aura-charcoal/60">
+                            {getStatusLabel(appt.status)}
+                          </span>
+                        </div>
+                      </motion.div>
+                    ))}
+
+                  {appointments
+                    .filter(a => isSameDay(new Date(a.start_time), day))
+                    .filter(a => selectedProf === 'all' || a.professional_id === selectedProf).length === 0 && !isOffDayForProf && (
+                    <div className="h-20 border-2 border-dashed border-aura-charcoal/5 rounded-2xl flex items-center justify-center">
+                      <span className="text-[10px] uppercase tracking-widest text-aura-charcoal/20">Vazio</span>
+                    </div>
+                  )}
+                </div>
               </div>
-
-              <div className="space-y-3 min-h-[500px]">
-                {appointments
-                  .filter(a => isSameDay(new Date(a.start_time), day))
-                  .filter(a => selectedProf === 'all' || a.professional_id === selectedProf)
-                  .map((appt) => (
-                    <motion.div
-                      layout
-                      key={appt.id}
-                      onClick={() => openModalForEdit(appt)}
-                      className={cn(
-                        "glass-card p-4 border-l-4 transition-all cursor-pointer hover:scale-[1.02]",
-                        getStatusStyles(appt.status)
-                      )}
-                    >
-                      {appt.status === 'scheduled' && (
-                        <div className="absolute top-0 right-0 w-2 h-2 mt-2 mr-2 rounded-full bg-aura-gold animate-ping opacity-75"></div>
-                      )}
-
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="text-[10px] font-bold text-aura-charcoal/60 flex items-center gap-1">
-                          {getStatusIcon(appt.status)}
-                          {format(new Date(appt.start_time), "HH:mm")}
-                        </span>
-                        {appt.price > 0 && <span className="text-[10px] font-bold text-aura-sage">R$ {appt.price}</span>}
-                      </div>
-
-                      <p className="font-serif text-sm mb-1 truncate leading-tight text-aura-charcoal">{appt.customer_name}</p>
-                      <p className="text-[10px] text-aura-charcoal/50 uppercase tracking-wider truncate mb-2" title={appt.service_name}>
-                        {appt.service_name || (appt.is_blocked ? 'INDISPONÍVEL' : 'Serviço')}
-                      </p>
-
-                      <div className="inline-block mt-1 px-2 py-0.5 rounded bg-white/50 border border-white/20">
-                        <span className="text-[8px] font-bold uppercase tracking-widest text-aura-charcoal/60">
-                          {getStatusLabel(appt.status)}
-                        </span>
-                      </div>
-                    </motion.div>
-                  ))}
-                {appointments.filter(a => isSameDay(new Date(a.start_time), day)).length === 0 && (
-                  <div className="h-20 border-2 border-dashed border-aura-charcoal/5 rounded-2xl flex items-center justify-center">
-                    <span className="text-[10px] uppercase tracking-widest text-aura-charcoal/20">Vazio</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -493,6 +513,19 @@ export function Calendar() {
                         <option value="">Selecionar...</option>
                         {professionals.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                       </select>
+                      {(() => {
+                        const selectedDateTime = formAppt.start_time ? new Date(formAppt.start_time) : null;
+                        const selectedProfObj = professionals.find(p => p.id === formAppt.professional_id);
+                        const isOffDayForSelectedProf = selectedDateTime && selectedProfObj?.off_days?.includes(selectedDateTime.getDay());
+                        if (isOffDayForSelectedProf) {
+                          return (
+                            <p className="text-[9px] text-aura-gold font-bold uppercase tracking-widest mt-1 flex items-center gap-1">
+                              ⚠️ Folga recorrente deste profissional!
+                            </p>
+                          );
+                        }
+                        return null;
+                      })()}
                     </div>
                     <div className="space-y-1">
                       <label className="text-[10px] uppercase tracking-widest text-aura-charcoal/40 font-bold flex justify-between">
