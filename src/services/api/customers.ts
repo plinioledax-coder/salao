@@ -99,7 +99,20 @@ export async function getCustomerByPhone(phone: string): Promise<Customer | null
 
   if (error) throw new Error(error.message);
 
-  // Procura por correspondência exata de números (removendo formatação do banco também)
-  const customer = data?.find(c => (c.phone || '').replace(/\D/g, '') === cleanPhone) || null;
+  // Normalização robusta para comparar números brasileiros (ignora DDI 55 ou zero à esquerda)
+  const normalize = (num: string) => {
+    let cleaned = num.replace(/\D/g, '');
+    if (cleaned.startsWith('55') && cleaned.length > 10) {
+      cleaned = cleaned.slice(2);
+    }
+    if (cleaned.startsWith('0') && cleaned.length > 9) {
+      cleaned = cleaned.slice(1);
+    }
+    return cleaned;
+  };
+
+  const cleanSearch = normalize(cleanPhone);
+
+  const customer = data?.find(c => normalize(c.phone || '') === cleanSearch) || null;
   return customer;
 }

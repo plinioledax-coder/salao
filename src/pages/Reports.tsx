@@ -102,7 +102,7 @@ export function Reports() {
           </h4>
           <div className="h-[350px] w-full">
             <div style={{ width: "100%", height: "100%" }}>
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <BarChart data={reportData.performanceData}>
                   <CartesianGrid
                     strokeDasharray="3 3"
@@ -151,7 +151,7 @@ export function Reports() {
           </h4>
           <div className="flex-1 h-[300px] w-full">
             <div style={{ width: "100%", height: "100%" }}>
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height="100%" minWidth={0}>
                 <PieChart>
                   <Pie
                     data={reportData.serviceDistribution}

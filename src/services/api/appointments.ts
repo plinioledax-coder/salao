@@ -39,16 +39,33 @@ export async function updateAppointmentFull(id: string, updates: Partial<any>): 
 
     // 1. Se o agendamento não tem um ID de cliente atrelado, vamos procurar ou criar!
     if (!customerId && updates.customer_name) {
-      // Tenta achar o cliente pelo nome ou telefone
-      const { data: existingCustomer } = await supabase
-        .from('customers')
-        .select('id')
-        .or(`name.ilike.${updates.customer_name},phone.eq.${updates.customer_phone}`)
-        .limit(1)
-        .single();
+      // Tenta achar o cliente pelo nome ou telefone robusto
+      const normalize = (num: string) => {
+        let cleaned = num.replace(/\D/g, '');
+        if (cleaned.startsWith('55') && cleaned.length > 10) {
+          cleaned = cleaned.slice(2);
+        }
+        if (cleaned.startsWith('0') && cleaned.length > 9) {
+          cleaned = cleaned.slice(1);
+        }
+        return cleaned;
+      };
 
-      if (existingCustomer) {
-        customerId = existingCustomer.id;
+      const cleanSearchPhone = normalize(updates.customer_phone || '');
+      const searchName = (updates.customer_name || '').toLowerCase().trim();
+
+      const { data: customers } = await supabase
+        .from('customers')
+        .select('id, name, phone');
+
+      const matchedCustomer = customers?.find(c => {
+        const hasSameName = c.name.toLowerCase().trim() === searchName;
+        const hasSamePhone = cleanSearchPhone && normalize(c.phone || '') === cleanSearchPhone;
+        return hasSameName || hasSamePhone;
+      });
+
+      if (matchedCustomer) {
+        customerId = matchedCustomer.id;
       } else {
         // NÃO EXISTE? Cria automaticamente na base de clientes!
         const { data: newCustomer } = await supabase

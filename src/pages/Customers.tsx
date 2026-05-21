@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getCustomers, getCustomerCRMData, updateCustomer, CustomerCRMData } from '../services/api/customers';
+import { getCustomers, getCustomerCRMData, updateCustomer, createCustomer, CustomerCRMData } from '../services/api/customers';
 import { Customer } from '../types';
 import { cn } from '../utils/cn';
 import {
@@ -72,6 +72,7 @@ export function Customers() {
 
   // Edit Mode States
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
   const [editForm, setEditForm] = useState<Partial<Customer>>({});
   const [notes, setNotes] = useState('');
   const [isSaving, setIsSaving] = useState(false);
@@ -79,11 +80,17 @@ export function Customers() {
   useEffect(() => { fetchCustomers(); }, []);
 
   useEffect(() => {
+    const cleanSearch = search.replace(/\D/g, '');
     setFiltered(
-      customers.filter(c =>
-        c.name.toLowerCase().includes(search.toLowerCase()) ||
-        (c.phone && c.phone.includes(search))
-      )
+      customers.filter(c => {
+        const matchesName = c.name.toLowerCase().includes(search.toLowerCase());
+        const cleanPhone = (c.phone || '').replace(/\D/g, '');
+        const matchesPhone = cleanPhone && (
+          cleanPhone.includes(cleanSearch) || 
+          (c.phone && c.phone.includes(search))
+        );
+        return matchesName || matchesPhone;
+      })
     );
   }, [search, customers]);
 
@@ -109,21 +116,57 @@ export function Customers() {
     } catch (error) { console.error(error); } finally { setLoadingCrm(false); }
   };
 
-  const handleUpdateProfile = async () => {
-    if (!selectedCustomer) return;
+  const handleSaveCustomer = async () => {
+    if (!isCreating && !selectedCustomer) return;
     setIsSaving(true);
     try {
-      const updates = { ...editForm, notes };
-      await updateCustomer(selectedCustomer.id, updates);
+      if (isCreating) {
+        const payload = {
+          name: editForm.name || '',
+          phone: editForm.phone || '',
+          email: editForm.email || '',
+          birthday: editForm.birthday || '',
+          is_vip: editForm.is_vip || false,
+          loyalty_points: 0,
+          notes: notes || ''
+        };
+        const newCust = await createCustomer(payload);
+        setCustomers(prev => [newCust, ...prev]);
+        setSelectedCustomer(newCust);
+        setIsCreating(false);
+        setIsEditingProfile(false);
+      } else if (selectedCustomer) {
+        const updates = { ...editForm, notes };
+        await updateCustomer(selectedCustomer.id, updates);
 
-      // Atualiza a lista local
-      setCustomers(prev => prev.map(c => c.id === selectedCustomer.id ? { ...c, ...updates } : c));
-      setSelectedCustomer({ ...selectedCustomer, ...updates } as Customer);
-      setIsEditingProfile(false);
+        // Atualiza a lista local
+        setCustomers(prev => prev.map(c => c.id === selectedCustomer.id ? { ...c, ...updates } : c));
+        setSelectedCustomer({ ...selectedCustomer, ...updates } as Customer);
+        setIsEditingProfile(false);
+      }
     } catch (error) {
-      alert("Erro ao atualizar perfil.");
+      alert("Erro ao salvar cliente.");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleOpenCreate = () => {
+    setSelectedCustomer(null);
+    setIsCreating(true);
+    setIsEditingProfile(true);
+    setEditForm({ name: '', phone: '', email: '', birthday: '', is_vip: false, loyalty_points: 0 });
+    setNotes('');
+  };
+
+  const handleSaveNotes = async () => {
+    if (!selectedCustomer) return;
+    try {
+      await updateCustomer(selectedCustomer.id, { notes });
+      setCustomers(prev => prev.map(c => c.id === selectedCustomer.id ? { ...c, notes } : c));
+      setSelectedCustomer(prev => prev ? { ...prev, notes } : null);
+    } catch (error) {
+      console.error("Erro ao salvar notas:", error);
     }
   };
 
@@ -152,7 +195,10 @@ export function Customers() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <button className="aura-button aura-button-primary flex items-center gap-2 shadow-lg shadow-aura-charcoal/10">
+          <button 
+            onClick={handleOpenCreate}
+            className="aura-button aura-button-primary flex items-center gap-2 shadow-lg shadow-aura-charcoal/10"
+          >
             <Plus className="w-4 h-4" /> Novo
           </button>
         </div>
@@ -183,12 +229,12 @@ export function Customers() {
       </div>
 
       {/* CRM DRAWER */}
-      <Drawer open={!!selectedCustomer} onClose={() => setSelectedCustomer(null)} title={isEditingProfile ? "Editar Dados do Cliente" : "Perfil do Cliente"}>
-        {selectedCustomer && (
+      <Drawer open={!!selectedCustomer || isCreating} onClose={() => { setSelectedCustomer(null); setIsCreating(false); }} title={isEditingProfile ? (isCreating ? "Novo Cliente" : "Editar Dados do Cliente") : "Perfil do Cliente"}>
+        {(selectedCustomer || isCreating) && (
           <div className="space-y-8 pb-10">
 
             {/* MODO EDIÇÃO VS VISUALIZAÇÃO */}
-            {!isEditingProfile ? (
+            {!isEditingProfile && selectedCustomer ? (
               <>
                 <div className="text-center space-y-2 relative group">
                   <button
@@ -247,7 +293,7 @@ export function Customers() {
                         className="w-full h-24 bg-white border border-aura-charcoal/10 rounded-2xl p-4 text-sm outline-none resize-none"
                         value={notes}
                         onChange={e => setNotes(e.target.value)}
-                        onBlur={handleUpdateProfile} // Salva ao sair do campo
+                        onBlur={handleSaveNotes} // Salva ao sair do campo
                         placeholder="Clique para adicionar notas..."
                       />
                     </div>
@@ -302,9 +348,9 @@ export function Customers() {
                 </div>
 
                 <div className="flex gap-3 pt-4">
-                  <button onClick={() => setIsEditingProfile(false)} className="flex-1 py-4 rounded-2xl bg-aura-soft-gray text-aura-charcoal font-bold text-xs uppercase tracking-widest">Cancelar</button>
-                  <button onClick={handleUpdateProfile} disabled={isSaving} className="flex-1 py-4 rounded-2xl bg-aura-charcoal text-white font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2">
-                    {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Salvar Alterações
+                  <button onClick={() => { setIsEditingProfile(false); setIsCreating(false); }} className="flex-1 py-4 rounded-2xl bg-aura-soft-gray text-aura-charcoal font-bold text-xs uppercase tracking-widest">Cancelar</button>
+                  <button onClick={handleSaveCustomer} disabled={isSaving} className="flex-1 py-4 rounded-2xl bg-aura-charcoal text-white font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2">
+                    {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} {isCreating ? "Salvar Cliente" : "Salvar Alterações"}
                   </button>
                 </div>
               </div>
