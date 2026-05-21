@@ -107,8 +107,21 @@ export function Professionals() {
       setIsEditing(false);
       setIsCreating(false);
       if (selectedProf) handleOpenProfile({ ...selectedProf, ...payload } as ProfessionalData);
-    } catch (error) {
-      alert("Erro ao salvar profissional.");
+    } catch (error: any) {
+      if (error.message === "COLUMN_OFF_DAYS_MISSING") {
+        alert(
+          "⚠️ Os dados básicos do profissional foram salvos com sucesso!\n\n" +
+          "Nota: Para habilitar a funcionalidade de 'Folgas Semanais', você precisa criar a coluna correspondente no Supabase.\n\n" +
+          "Por favor, execute o seguinte comando no painel SQL Editor do seu Supabase:\n" +
+          "ALTER TABLE professionals ADD COLUMN off_days integer[] DEFAULT '{}';"
+        );
+        await fetchTeam();
+        setIsEditing(false);
+        setIsCreating(false);
+        if (selectedProf) handleOpenProfile({ ...selectedProf, ...editForm } as ProfessionalData);
+      } else {
+        alert("Erro ao salvar profissional.");
+      }
     } finally {
       setIsSaving(false);
     }

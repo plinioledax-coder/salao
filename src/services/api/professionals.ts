@@ -21,23 +21,62 @@ export async function getProfessionals(includeInactive = false): Promise<Profess
 }
 
 export async function createProfessional(professional: Partial<ProfessionalData>): Promise<ProfessionalData> {
+  const safePayload = { ...professional };
+  delete safePayload.id;
+  // @ts-ignore
+  delete safePayload.created_at;
+
   const { data, error } = await supabase
     .from('professionals')
-    .insert([professional])
+    .insert([safePayload])
     .select()
     .single();
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (error.message.includes("off_days") || error.details?.includes("off_days") || error.message.includes("PGRST204")) {
+      const fallbackPayload = { ...safePayload };
+      delete fallbackPayload.off_days;
+      
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('professionals')
+        .insert([fallbackPayload])
+        .select()
+        .single();
+        
+      if (fallbackError) throw new Error(fallbackError.message);
+      throw new Error("COLUMN_OFF_DAYS_MISSING");
+    }
+    throw new Error(error.message);
+  }
   return data;
 }
 
 export async function updateProfessional(id: string, updates: Partial<ProfessionalData>): Promise<void> {
+  const safeUpdates = { ...updates };
+  delete safeUpdates.id;
+  // @ts-ignore
+  delete safeUpdates.created_at;
+
   const { error } = await supabase
     .from('professionals')
-    .update(updates)
+    .update(safeUpdates)
     .eq('id', id);
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    if (error.message.includes("off_days") || error.details?.includes("off_days") || error.message.includes("PGRST204")) {
+      const fallbackUpdates = { ...safeUpdates };
+      delete fallbackUpdates.off_days;
+      
+      const { error: fallbackError } = await supabase
+        .from('professionals')
+        .update(fallbackUpdates)
+        .eq('id', id);
+        
+      if (fallbackError) throw new Error(fallbackError.message);
+      throw new Error("COLUMN_OFF_DAYS_MISSING");
+    }
+    throw new Error(error.message);
+  }
 }
 
 // --- DASHBOARD INDIVIDUAL DO PROFISSIONAL ---
